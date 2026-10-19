@@ -131,6 +131,22 @@
       "final": {"no_writes": true, "reply_contains_any": ["23:00", "11 pm", "11 PM", "11:00 pm", "11:00 PM"]}
     },
     {
+      "id": "menu-not-in-data",
+      "journey": "Question the data cannot answer",
+      "turns": [
+        {"guest": "What's on the menu at Trattoria Jayanagar?", "required": [], "allowed": ["recommend_restaurants", "get_restaurant_details"]}
+      ],
+      "final": {"no_writes": true, "reply_contains_any": ["menu"], "reply_excludes": ["only help with GoodFoods"]}
+    },
+    {
+      "id": "other-city",
+      "journey": "Outlet outside Bengaluru",
+      "turns": [
+        {"guest": "Do you have an outlet in Mumbai?", "required": [], "allowed": ["recommend_restaurants"]}
+      ],
+      "final": {"no_writes": true, "reply_contains_any": ["Bengaluru", "Bangalore"], "reply_excludes": ["only help with GoodFoods"]}
+    },
+    {
       "id": "past-date",
       "journey": "Impossible request: past date",
       "turns": [
@@ -185,7 +201,7 @@
           "args": {"make_reservation": {"restaurant_id": "R010", "date": "2026-10-23", "time": "13:00", "party_size": 2, "guest_name": "ansh"}}
         }
       ],
-      "final": {"no_writes": true, "reply_contains_any": ["?"]}
+      "final": {"no_writes": true, "reply_contains_any": ["?"], "reply_excludes": ["only help with GoodFoods"]}
     },
     {
       "id": "off-topic",

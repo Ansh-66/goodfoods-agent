@@ -43,6 +43,13 @@ def test_wrong_tool_and_wrong_argument_are_both_caught(conn):
     assert summary["tool_selection"] == 0 and summary["case_success"] == 0
 
 
+def test_refusing_an_in_scope_question_fails_the_case(conn):
+    refusal = Scripted(ModelReply("I can only help with GoodFoods reservations."))
+    assert asyncio.run(run_eval.main(["--case", "menu-not-in-data"], model=refusal))["case_success"] == 0
+    honest = Scripted(ModelReply("I don't have the menu, but it serves Italian food for about 1,800 for two."))
+    assert asyncio.run(run_eval.main(["--case", "menu-not-in-data"], model=honest))["case_success"] == 1
+
+
 class QuotaRunsOut:
     """Answers in plain text, then hits the rate limit after `budget` calls (once only)."""
 

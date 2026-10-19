@@ -121,6 +121,8 @@ def check_final(spec: dict, conn, seeded: int, reservation_id: str | None, reply
         failures += [f"{k}={row[k]!r}, expected {v!r}" for k, v in spec["reservation"].items() if row[k] != v]
     if "reply_contains_any" in spec and not any(s.lower() in reply.lower() for s in spec["reply_contains_any"]):
         failures.append(f"last reply mentions none of {spec['reply_contains_any']}")
+    if found := [s for s in spec.get("reply_excludes", []) if s.lower() in reply.lower()]:
+        failures.append(f"last reply contains {found}")
     return failures
 
 
