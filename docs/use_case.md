@@ -90,7 +90,7 @@ stateDiagram-v2
 | Graceful errors: past dates, closed hours, impossible party sizes, malformed tool calls | Green | Errors return to the model as readable results so it can correct itself |
 | Human hand-off with a summary | Green | Ticket stored with summary and callback number |
 | Voice in the web app: speak a request, hear the reply | Green | Sarvam Saaras (speech-to-text) and Bulbul (text-to-speech) |
-| Indian languages: speak in Hindi, Kannada, Tamil and more, get replies in that language | Green | Translation at the edges (Saaras, Mayura); the agent itself stays English; replies spoken in 11 languages |
+| Indian languages: speak in Hindi, Kannada, Tamil and more, get replies in that language | Green | Translation at the edges (Saaras, Sarvam-Translate); the agent itself stays English; replies spoken in 11 languages |
 | Hand-off into GoodFoods' ticketing or CRM | Yellow | Integration with their system |
 | Confirmations and reminders to cut no-shows | Yellow | SMS or WhatsApp integration |
 | Guest profiles (dietary needs, past visits, occasions) | Yellow | Consent and CRM integration |

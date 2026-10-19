@@ -44,6 +44,7 @@ st.set_page_config(page_title="GoodFoods Reservations", page_icon="🍽️", lay
 def reset() -> None:
     st.session_state.conversation = Conversation()
     st.session_state.transcript = []  # dicts: role, text, and optional note, english, audio, turn, seconds
+    st.session_state.language = ENGLISH  # replies follow the language the guest last spoke
 
 
 if "conversation" not in st.session_state:
@@ -126,7 +127,10 @@ with st.sidebar:
     st.divider()
     st.button("New conversation", on_click=reset, use_container_width=True)
     st.caption(f"Model: {os.environ.get('GOODFOODS_MODEL', DEFAULT_MODEL)} on Groq")
-    st.caption("Voice: Sarvam AI" if VOICE_ENABLED else "Voice off: set SARVAM_API_KEY to enable")
+    if VOICE_ENABLED:
+        st.caption(f"Voice: Sarvam AI · replying in {language_name(st.session_state.language)}")
+    else:
+        st.caption("Voice off: set SARVAM_API_KEY to enable")
 
 st.title("GoodFoods - Reserve a table")
 
@@ -155,7 +159,7 @@ else:
     typed, recording = submitted.text or None, submitted.audio
 typed = typed or st.session_state.pop("queued", None)
 
-guest_text, language = typed, ENGLISH
+guest_text = typed
 if not typed and recording:
     try:
         heard = asyncio.run(Voice().listen(recording.getvalue()))
@@ -166,9 +170,10 @@ if not typed and recording:
     if not heard.english:
         st.warning("I didn't catch that. Please try again.")
         st.stop()
-    guest_text, language = heard.english, heard.language
+    guest_text, st.session_state.language = heard.english, heard.language
 
 if guest_text:
+    language = st.session_state.language
     show({"role": "user", "text": guest_text, "note": None if typed else f"Spoken in {language_name(language)}"})
     with st.spinner("Checking tables..."):
         started = time.perf_counter()

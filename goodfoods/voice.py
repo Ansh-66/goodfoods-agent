@@ -3,24 +3,26 @@
     guest speech, any Indian language
       -> Saaras (speech-to-text, translate mode): English text + detected language
       -> the agent, unchanged: same loop, prompt, tools and eval as typed English
-      -> Mayura / Sarvam-Translate: the English reply in the guest's language
+      -> Sarvam-Translate: the English reply in the guest's language, line by line
       -> Bulbul (text-to-speech): that reply as audio, only when the guest asks to hear it
 
 Keeping language at the edges means the agent, its prompt and its evaluation
 stay English-only, and a new language costs nothing behind this module.
 """
 
+import asyncio
 import base64
 import os
+import re
 from dataclasses import dataclass
 
 from sarvamai import AsyncSarvamAI, BadRequestError, UnprocessableEntityError
 
-from .generate_data import AREAS
+from .generate_data import AREAS, CONCEPTS
 
 ENGLISH = "en-IN"
-# Bulbul speaks, and Mayura translates colloquially, in these 11 languages.
-# Saaras recognises more; for those the reply is translated but not spoken.
+# Bulbul speaks these 11 languages. Saaras and Sarvam-Translate cover 22;
+# for the others the reply is translated but not spoken.
 SPOKEN_LANGUAGES = {
     "en-IN": "English",
     "hi-IN": "Hindi",
@@ -35,8 +37,17 @@ SPOKEN_LANGUAGES = {
     "te-IN": "Telugu",
 }
 TTS_MAX_CHARS = 1500
-# Words a general speech model mishears ("Koramangala" -> "Porumangala"): sent as recognition hints.
-KEYTERMS = ["GoodFoods", *(name for name, _, _ in AREAS)]
+# Words a general speech model mishears ("Koramangala" -> "Porumangala", "Italian" -> "Italy"):
+# sent as recognition hints.
+KEYTERMS = ["GoodFoods", *(a[0] for a in AREAS), *sorted({c for concept in CONCEPTS for c in concept[1]})]
+
+LIST_MARKER = re.compile(r"^(\s*(?:[-*+]|\d+[.)])\s+)(.*)$")
+ODD_SPACES = re.compile(r"[\u00a0\u2009\u202f]")  # the model writes "8\u202fpm"; translators mangle it
+
+
+def plain(text: str) -> str:
+    """Text as a translator or speech engine should see it: no markdown bold, ordinary spaces."""
+    return ODD_SPACES.sub(" ", text).replace("**", "")
 
 
 @dataclass
@@ -62,24 +73,32 @@ class Voice:
         return Heard(result.transcript.strip(), result.language_code or ENGLISH)
 
     async def translate(self, english: str, language: str) -> str:
+        """Translate line by line, keeping list markers and blank lines, so a numbered list of
+        outlets stays a list instead of collapsing into one paragraph."""
         if language == ENGLISH:
             return english
-        colloquial = language in SPOKEN_LANGUAGES  # Mayura's languages; the rest use Sarvam-Translate
-        result = await self.client.text.translate(
-            input=english,
-            source_language_code=ENGLISH,
-            target_language_code=language,
-            model="mayura:v1" if colloquial else "sarvam-translate:v1",
-            mode="modern-colloquial" if colloquial else "formal",
-            numerals_format="international",  # keep times, ids and party sizes in digits
-        )
-        return result.translated_text
+
+        async def line(text: str) -> str:
+            match = LIST_MARKER.match(text)
+            marker, body = (match[1], match[2]) if match else ("", text)
+            if not body.strip():
+                return text
+            result = await self.client.text.translate(
+                input=plain(body),
+                source_language_code=ENGLISH,
+                target_language_code=language,
+                model="sarvam-translate:v1",  # native script throughout, all 22 languages
+                numerals_format="international",  # keep times, ids and party sizes in digits
+            )
+            return marker + result.translated_text
+
+        return "\n".join(await asyncio.gather(*(line(t) for t in english.split("\n"))))
 
     async def speak(self, text: str, language: str) -> bytes | None:
         """WAV audio of `text`, or None when Bulbul does not speak `language`."""
         if language not in SPOKEN_LANGUAGES:
             return None
         speech = await self.client.text_to_speech.convert(
-            text=text[:TTS_MAX_CHARS], language_code=language, model="bulbul:v3"
+            text=plain(text)[:TTS_MAX_CHARS], language_code=language, model="bulbul:v3"
         )
         return base64.b64decode(speech.audios[0])

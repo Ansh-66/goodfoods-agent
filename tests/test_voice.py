@@ -4,14 +4,16 @@ import asyncio
 import base64
 from types import SimpleNamespace
 
+import pytest
 from sarvamai import BadRequestError
 
-from goodfoods.voice import KEYTERMS, Voice
+from goodfoods.voice import ENGLISH, KEYTERMS, SPOKEN_LANGUAGES, Voice
 
 
 class FakeSarvam:
     def __init__(self, heard_language="kn-IN", reject_keyterms=False):
         self.calls = []
+        self.inputs = []
         self.reject_keyterms = reject_keyterms
         self.heard_language = heard_language
         self.speech_to_text = SimpleNamespace(transcribe=self._transcribe)
@@ -26,7 +28,8 @@ class FakeSarvam:
 
     async def _translate(self, **kwargs):
         self.calls.append(("translate", kwargs["target_language_code"], kwargs["model"]))
-        return SimpleNamespace(translated_text="<translated>")
+        self.inputs.append(kwargs["input"])
+        return SimpleNamespace(translated_text=f"<{kwargs['input']}>")
 
     async def _convert(self, **kwargs):
         self.calls.append(("speak", kwargs["language_code"]))
@@ -45,8 +48,13 @@ def test_speech_in_an_indian_language_round_trips():
     heard = asyncio.run(voice.listen(b"audio"))
     text = asyncio.run(voice.translate("Booked: GF7K2QXM at 20:00.", heard.language))
     audio = asyncio.run(voice.speak(text, heard.language))
-    assert (heard.english, heard.language, text, audio) == ("Table for two tomorrow", "kn-IN", "<translated>", b"WAV")
-    assert fake.calls == [("transcribe", "translate"), ("translate", "kn-IN", "mayura:v1"), ("speak", "kn-IN")]
+    assert (heard.english, heard.language, audio) == ("Table for two tomorrow", "kn-IN", b"WAV")
+    assert text == "<Booked: GF7K2QXM at 20:00.>"
+    assert fake.calls == [
+        ("transcribe", "translate"),
+        ("translate", "kn-IN", "sarvam-translate:v1"),
+        ("speak", "kn-IN"),
+    ]
 
 
 def test_english_is_not_translated():
@@ -60,6 +68,31 @@ def test_language_bulbul_cannot_speak_is_translated_but_not_spoken():
     asyncio.run(voice.translate("Done.", "ur-IN"))
     assert asyncio.run(voice.speak("Done.", "ur-IN")) is None
     assert fake.calls == [("translate", "ur-IN", "sarvam-translate:v1")]
+
+
+REPLY = (
+    "Here are three options near Koramangala:\n"
+    "\n"
+    "1. GoodFoods Trattoria, Jayanagar \u2013 3\u202fkm away, 4.7\u202f\u2605, free at 8\u202fpm.\n"
+    "2. GoodFoods Trattoria, Ulsoor \u2013 5.7\u202fkm away.\n"
+    "- Your booking id is **GFEEREKE**.\n"
+    "Which one would you like?"
+)
+
+
+@pytest.mark.parametrize("language", [code for code in SPOKEN_LANGUAGES if code != ENGLISH] + ["ur-IN"])
+def test_translation_keeps_lists_and_clean_spacing_in_every_language(language):
+    fake = FakeSarvam()
+    translated = asyncio.run(voice_with(fake).translate(REPLY, language))
+    assert translated.split("\n") == [
+        "<Here are three options near Koramangala:>",
+        "",
+        "1. <GoodFoods Trattoria, Jayanagar \u2013 3 km away, 4.7 \u2605, free at 8 pm.>",
+        "2. <GoodFoods Trattoria, Ulsoor \u2013 5.7 km away.>",
+        "- <Your booking id is GFEEREKE.>",
+        "<Which one would you like?>",
+    ]
+    assert not any("\u202f" in text or "**" in text for text in fake.inputs)
 
 
 def test_area_names_are_sent_as_hints_and_dropped_if_rejected():
