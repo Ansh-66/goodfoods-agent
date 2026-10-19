@@ -1,0 +1,38 @@
+[project]
+name = "goodfoods-agent"
+version = "1.0.0"
+description = "Conversational reservation agent for the GoodFoods restaurant chain: an MCP tool server, a from-scratch agent loop on Llama 3.1 8B, and an evaluation harness."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp==2.3.0",
+    "groq==1.7.0",
+    "streamlit==1.66.0",
+    "pydantic>=2.7",
+    "python-dotenv>=1.0",
+    "tzdata",  # zoneinfo has no timezone database on Windows without it
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["goodfoods*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.format]
+skip-magic-trailing-comma = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

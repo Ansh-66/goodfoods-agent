@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+data/goodfoods.db
+data/goodfoods.db-*
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
