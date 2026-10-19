@@ -113,6 +113,8 @@ stateDiagram-v2
 
 **Vertical expansion.** The core is matching a request to limited capacity at a specific time across multiple locations. The same tools-and-agent design transfers, with a new catalogue and capacity model, to other restaurant chains and cloud-kitchen brands, salons and spas (stylist slots), clinics and diagnostic labs (doctor and test slots), sports courts and gyms, coworking meeting rooms, and hotel dining and events. Each needs only its own capacity rules and catalogue, which makes this a repeatable product rather than a one-off build.
 
+**Potential customers.** The best first customers share GoodFoods' problem: multi-outlet casual and fine-dining chains in Indian metros, with bookings taken by phone at each branch and guests turned away at weekend peaks. Next come hotel groups running several restaurants per property, and food courts or dining destinations with many outlets under one operator. The buyer is the head of operations or the digital/CX lead; the proof they need is the pilot's overflow-recovery and completion numbers.
+
 **Competitive advantages.**
 1. **Chain-level overflow routing.** Single-restaurant booking tools cannot send a guest to a sister outlet; this turns "sorry, we're full" into a saved booking.
 2. **Measured reliability.** Tool selection and argument accuracy are numbers tracked per release, not a demo impression, and writes are gated in code, so a model mistake cannot create a booking the guest did not approve.
