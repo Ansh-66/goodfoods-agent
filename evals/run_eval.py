@@ -36,6 +36,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from contextlib import closing
 from datetime import datetime
 from pathlib import Path
 
@@ -127,29 +128,30 @@ async def run_case(case: dict, model: ChatModel, seeded_db: Path, workdir: Path)
     db = workdir / f"{case['id']}.db"
     shutil.copy(seeded_db, db)
     os.environ["GOODFOODS_DB"] = str(db)
-    conn = connect(db)
-    reservation_id = None
-    if "setup" in case:
-        s = case["setup"]
-        reservation_id = reservations.make_reservation(
-            conn, s["restaurant_id"], s["date"], s["time"], s["party_size"], s["guest_name"]
-        )["reservation_id"]
-    seeded = conn.execute("SELECT COUNT(*) FROM reservations").fetchone()[0]
+    # closing() releases the file even when a rate-limit error ends the case early;
+    # Windows cannot delete the temp folder while a connection holds it open.
+    with closing(connect(db)) as conn:
+        reservation_id = None
+        if "setup" in case:
+            s = case["setup"]
+            reservation_id = reservations.make_reservation(
+                conn, s["restaurant_id"], s["date"], s["time"], s["party_size"], s["guest_name"]
+            )["reservation_id"]
+        seeded = conn.execute("SELECT COUNT(*) FROM reservations").fetchone()[0]
 
-    conv, turns, totals, reply = Conversation(), [], {"model_calls": 0, "tokens": 0, "seconds": 0.0}, ""
-    async with Client(mcp) as session:
-        for spec in case["turns"]:
-            spec = json.loads(json.dumps(spec).replace("{reservation_id}", reservation_id or ""))
-            started = time.perf_counter()
-            turn = await run_turn(conv, spec["guest"], model, session)
-            totals["seconds"] += time.perf_counter() - started
-            totals["model_calls"] += turn.model_calls
-            totals["tokens"] += turn.input_tokens + turn.output_tokens
-            reply = turn.reply
-            turns.append({**score_turn(spec, turn.steps), "reply": reply})
+        conv, turns, totals, reply = Conversation(), [], {"model_calls": 0, "tokens": 0, "seconds": 0.0}, ""
+        async with Client(mcp) as session:
+            for spec in case["turns"]:
+                spec = json.loads(json.dumps(spec).replace("{reservation_id}", reservation_id or ""))
+                started = time.perf_counter()
+                turn = await run_turn(conv, spec["guest"], model, session)
+                totals["seconds"] += time.perf_counter() - started
+                totals["model_calls"] += turn.model_calls
+                totals["tokens"] += turn.input_tokens + turn.output_tokens
+                reply = turn.reply
+                turns.append({**score_turn(spec, turn.steps), "reply": reply})
 
-    failures = check_final(case.get("final", {}), conn, seeded, reservation_id, reply)
-    conn.close()
+        failures = check_final(case.get("final", {}), conn, seeded, reservation_id, reply)
     return {
         "id": case["id"],
         "journey": case["journey"],
