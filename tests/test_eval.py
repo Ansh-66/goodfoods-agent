@@ -50,6 +50,22 @@ def test_refusing_an_in_scope_question_fails_the_case(conn):
     assert asyncio.run(run_eval.main(["--case", "menu-not-in-data"], model=honest))["case_success"] == 1
 
 
+def test_seeded_guests_sharing_a_name_do_not_count_as_new_bookings(conn):
+    # "Rohan" is also a seeded guest name; only bookings made during the case may count.
+    handoff = {
+        "reason": "large_group",
+        "summary": "25 people tomorrow",
+        "guest_name": "Rohan",
+        "guest_phone": "9812345678",
+    }
+    model = Scripted(
+        ModelReply("Groups over 12 are handled by our staff. May I have your name and phone?"),
+        ModelReply(None, [ToolRequest("c1", "request_human_handoff", json.dumps(handoff))]),
+        ModelReply("Done: our team will call you back."),
+    )
+    assert asyncio.run(run_eval.main(["--case", "large-group-handoff"], model=model))["case_success"] == 1
+
+
 class QuotaRunsOut:
     """Answers in plain text, then hits the rate limit after `budget` calls (once only)."""
 

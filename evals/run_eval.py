@@ -100,7 +100,9 @@ def score_turn(spec: dict, steps) -> dict:
     }
 
 
-def check_final(spec: dict, conn, seeded: int, reservation_id: str | None, reply: str) -> list[str]:
+def check_final(
+    spec: dict, conn, seeded: int, last_seeded_row: int, reservation_id: str | None, reply: str
+) -> list[str]:
     failures = []
     count = conn.execute("SELECT COUNT(*) FROM reservations").fetchone()[0]
     handoffs = conn.execute("SELECT COUNT(*) FROM handoffs").fetchone()[0]
@@ -110,9 +112,10 @@ def check_final(spec: dict, conn, seeded: int, reservation_id: str | None, reply
         failures.append(f"handoffs={handoffs}, expected {spec['handoffs']}")
     if "reservations_by" in spec:
         want = spec["reservations_by"]
-        n = conn.execute(
-            "SELECT COUNT(*) FROM reservations WHERE lower(guest_name) = lower(?) AND status = 'confirmed'",
-            (want["guest_name"],),
+        n = conn.execute(  # only bookings made during the case: seeded guests can share the name
+            "SELECT COUNT(*) FROM reservations WHERE lower(guest_name) = lower(?) AND status = 'confirmed' "
+            "AND rowid > ?",
+            (want["guest_name"], last_seeded_row),
         ).fetchone()[0]
         if n != want["count"]:
             failures.append(f"{n} bookings for {want['guest_name']}, expected {want['count']}")
@@ -140,6 +143,7 @@ async def run_case(case: dict, model: ChatModel, seeded_db: Path, workdir: Path)
                 conn, s["restaurant_id"], s["date"], s["time"], s["party_size"], s["guest_name"]
             )["reservation_id"]
         seeded = conn.execute("SELECT COUNT(*) FROM reservations").fetchone()[0]
+        last_seeded_row = conn.execute("SELECT MAX(rowid) FROM reservations").fetchone()[0]
 
         conv, turns, totals, reply = Conversation(), [], {"model_calls": 0, "tokens": 0, "seconds": 0.0}, ""
         async with Client(mcp) as session:
@@ -153,7 +157,7 @@ async def run_case(case: dict, model: ChatModel, seeded_db: Path, workdir: Path)
                 reply = turn.reply
                 turns.append({**score_turn(spec, turn.steps), "reply": reply})
 
-        failures = check_final(case.get("final", {}), conn, seeded, reservation_id, reply)
+        failures = check_final(case.get("final", {}), conn, seeded, last_seeded_row, reservation_id, reply)
     return {
         "id": case["id"],
         "journey": case["journey"],

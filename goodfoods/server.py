@@ -29,7 +29,8 @@ mcp = MCPServer("goodfoods-reservations")
 
 Date = Annotated[str, Field(description="YYYY-MM-DD")]
 Time = Annotated[str, Field(description="24-hour HH:MM on the hour or half hour, e.g. 19:30")]
-RestaurantId = Annotated[str, Field(description="Outlet id, e.g. R012")]
+# No example id here: a model copies a concrete example ("R012") instead of looking one up.
+RestaurantId = Annotated[str, Field(description="Outlet id exactly as returned by recommend_restaurants")]
 ReservationId = Annotated[str, Field(description="Booking id, e.g. GF7K2QXM")]
 # Set by the agent loop, never by the model: the loop strips it from the schemas it sends.
 DryRun = Annotated[bool, Field(description="Check everything, write nothing")]
@@ -65,7 +66,9 @@ def recommend_restaurants(
     name: Annotated[str | None, Field(description="Part of an outlet name")] = None,
     limit: int = 3,
 ) -> dict:
-    """Find and rank GoodFoods outlets for the guest, with a reason for each.
+    """Find and rank GoodFoods outlets for the guest, with a reason for each. Use it to find an
+    outlet's id. To answer whether one specific outlet is free, follow up with check_availability,
+    which also returns alternatives when that outlet is full.
     All filters are optional. Pass date and time to rank outlets that are free first."""
     return _run(
         catalog.recommend_restaurants,

@@ -180,7 +180,7 @@
       "id": "complaint-handoff",
       "journey": "Complaint: hand-off to staff",
       "turns": [
-        {"guest": "The food at your Jayanagar outlet was cold yesterday. I want to complain.", "required": [], "allowed": []},
+        {"guest": "The food at your Jayanagar outlet was cold yesterday. I want to complain.", "required": [], "allowed": ["request_human_handoff"]},
         {
           "guest": "Kabir, 9900112233",
           "required": ["request_human_handoff"],
