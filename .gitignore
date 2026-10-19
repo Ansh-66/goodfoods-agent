@@ -8,3 +8,4 @@ data/goodfoods.db-*
 .ruff_cache/
 *.egg-info/
 build/
+evals/progress.json

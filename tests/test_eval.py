@@ -5,6 +5,9 @@ import importlib.util
 import json
 from pathlib import Path
 
+import httpx
+from groq import RateLimitError
+
 from goodfoods.agent.llm import ModelReply, ToolRequest
 
 spec = importlib.util.spec_from_file_location("run_eval", Path(__file__).parents[1] / "evals" / "run_eval.py")
@@ -38,3 +41,30 @@ def test_wrong_tool_and_wrong_argument_are_both_caught(conn):
     model = Scripted(ModelReply("Here is a poem about cricket..."))
     summary = asyncio.run(run_eval.main(["--case", "lookup"], model=model))
     assert summary["tool_selection"] == 0 and summary["case_success"] == 0
+
+
+class QuotaRunsOut:
+    """Answers in plain text, then hits the rate limit after `budget` calls (once only)."""
+
+    def __init__(self, budget):
+        self.budget = budget
+
+    async def complete(self, messages, tools):
+        if self.budget == 0:
+            self.budget = None
+            response = httpx.Response(429, request=httpx.Request("POST", "https://api.groq.com"))
+            raise RateLimitError("tokens per day", response=response, body=None)
+        if self.budget:
+            self.budget -= 1
+        return ModelReply("Sorry, which outlet?")
+
+
+def test_run_stopped_by_the_rate_limit_resumes_where_it_left_off(conn, tmp_path):
+    model = QuotaRunsOut(budget=3)
+    assert asyncio.run(run_eval.main([], model=model, out_dir=tmp_path)) is None
+    saved = json.loads((tmp_path / "progress.json").read_text())["results"]
+    assert 0 < len(saved) < len(run_eval.CASES["cases"])
+
+    summary = asyncio.run(run_eval.main([], model=model, out_dir=tmp_path))
+    assert summary["cases"] == len(run_eval.CASES["cases"])
+    assert (tmp_path / "results.md").exists() and not (tmp_path / "progress.json").exists()

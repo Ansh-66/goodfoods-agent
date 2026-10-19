@@ -53,9 +53,9 @@ streamlit run streamlit_app.py
 **Checks**
 
 ```bash
-pytest                             # 56 tests, no API key needed (the model is scripted)
+pytest                             # 57 tests, no API key needed (the model is scripted)
 ruff check . && ruff format --check .
-python evals/run_eval.py           # live evaluation against Groq; uses a large share of the free daily quota
+python evals/run_eval.py           # live evaluation against Groq; resumable if the free daily quota runs out
 ```
 
 **Try these** (the demo data makes some outlets full at dinner):
@@ -150,6 +150,8 @@ The system prompt is in `goodfoods/agent/prompt.py` and is rebuilt every turn. T
 
 PENDING: results table from `evals/results.md` after the live run.
 
+A full run saves each finished case, so when the free tier's daily token limit stops it, the same command resumes the next day. Saved progress is reused only if the git commit, the model and `cases.json` are unchanged, so a report never mixes two versions of the agent; the commit is printed in the report.
+
 The harness itself is tested (`tests/test_eval.py`): a scripted model shows that a correct run scores full marks and that a wrong tool or a wrong argument is caught.
 
 ## Example conversations
@@ -206,7 +208,7 @@ goodfoods/
   db.py, setup_db.py, generate_data.py, config.py, errors.py
 streamlit_app.py    chat UI
 evals/              cases.json, run_eval.py, results
-tests/              56 tests: rules, MCP server, agent loop, voice layer, UI, eval harness
+tests/              57 tests: rules, MCP server, agent loop, voice layer, UI, eval harness
 docs/use_case.md    business use-case document
 data/restaurants.json
 ```
