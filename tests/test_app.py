@@ -2,7 +2,9 @@
 
 import json
 
+import httpx
 import pytest
+from groq import AuthenticationError
 from streamlit.testing.v1 import AppTest
 
 import goodfoods.agent
@@ -35,3 +37,17 @@ def test_chat_turn_shows_reply_and_tool_trace(app):
     app.chat_input[0].set_value("When does R010 close?").run()
     assert app.chat_message[-1].markdown[0].value == "It closes at 23:00."
     assert app.expander[0].label == "Tools used (1)"
+
+
+class RejectedKeyModel:
+    async def complete(self, messages, tools):
+        response = httpx.Response(401, request=httpx.Request("POST", "https://api.groq.com"))
+        raise AuthenticationError("Invalid API Key", response=response, body=None)
+
+
+def test_rejected_api_key_shows_a_clear_error(conn, monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "wrong")
+    monkeypatch.setattr(goodfoods.agent, "GroqModel", RejectedKeyModel)
+    app = AppTest.from_file("../streamlit_app.py", default_timeout=60).run()
+    app.chat_input[0].set_value("hi").run()
+    assert not app.exception and "rejected the API key" in app.error[0].value

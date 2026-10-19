@@ -16,7 +16,7 @@ import time
 
 import streamlit as st
 from dotenv import load_dotenv
-from groq import APIError
+from groq import APIError, AuthenticationError
 
 from goodfoods.agent import Conversation, GroqModel, TurnResult, mcp_session, run_turn
 from goodfoods.agent.llm import DEFAULT_MODEL
@@ -42,6 +42,17 @@ def reset() -> None:
 
 if "conversation" not in st.session_state:
     reset()
+
+
+def model_error(exc: BaseException) -> APIError | None:
+    """The Groq error behind `exc`, if any. The MCP client runs inside an anyio task
+    group, which wraps whatever is raised in an ExceptionGroup."""
+    if isinstance(exc, APIError):
+        return exc
+    for inner in getattr(exc, "exceptions", ()):
+        if found := model_error(inner):
+            return found
+    return None
 
 
 async def take_turn(text: str) -> TurnResult:
@@ -99,9 +110,15 @@ if guest_text:
         started = time.perf_counter()
         try:
             turn = asyncio.run(take_turn(guest_text))
-        except APIError:
-            log.exception("model call failed")
-            st.error("The language model is not responding (possibly the free-tier rate limit). Try again shortly.")
+        except Exception as exc:
+            error = model_error(exc)
+            if error is None:
+                raise
+            log.error("model call failed: %s", error)
+            if isinstance(error, AuthenticationError):
+                st.error("Groq rejected the API key. Check GROQ_API_KEY in .env, then restart the app.")
+            else:
+                st.error("The language model is not responding (possibly the free-tier rate limit). Try again shortly.")
             st.stop()
         seconds = time.perf_counter() - started
         st.markdown(turn.reply)
