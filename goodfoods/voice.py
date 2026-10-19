@@ -12,6 +12,7 @@ stay English-only, and a new language costs nothing behind this module.
 
 import asyncio
 import base64
+import logging
 import os
 import re
 from dataclasses import dataclass
@@ -19,6 +20,8 @@ from dataclasses import dataclass
 from sarvamai import AsyncSarvamAI, BadRequestError, UnprocessableEntityError
 
 from .generate_data import AREAS, CONCEPTS
+
+log = logging.getLogger(__name__)
 
 ENGLISH = "en-IN"
 # Bulbul speaks these 11 languages. Saaras and Sarvam-Translate cover 22;
@@ -38,7 +41,7 @@ SPOKEN_LANGUAGES = {
 }
 TTS_MAX_CHARS = 1500
 # Words a general speech model mishears ("Koramangala" -> "Porumangala", "Italian" -> "Italy"):
-# sent as recognition hints.
+# sent as recognition hints. Saaras v4 only; at most 50 terms of up to 64 characters.
 KEYTERMS = ["GoodFoods", *(a[0] for a in AREAS), *sorted({c for concept in CONCEPTS for c in concept[1]})]
 
 LIST_MARKER = re.compile(r"^(\s*(?:[-*+]|\d+[.)])\s+)(.*)$")
@@ -65,11 +68,12 @@ class Voice:
         self.client = AsyncSarvamAI(api_subscription_key=api_key or os.environ.get("SARVAM_API_KEY"))
 
     async def listen(self, audio: bytes) -> Heard:
-        request = {"file": ("guest.wav", audio, "audio/wav"), "model": "saaras:v3", "mode": "translate"}
+        request = {"file": ("guest.wav", audio, "audio/wav"), "mode": "translate"}
         try:
-            result = await self.client.speech_to_text.transcribe(**request, keyterms=KEYTERMS)
-        except (BadRequestError, UnprocessableEntityError):  # hints rejected: recognise without them
-            result = await self.client.speech_to_text.transcribe(**request)
+            result = await self.client.speech_to_text.transcribe(**request, model="saaras:v4", keyterms=KEYTERMS)
+        except (BadRequestError, UnprocessableEntityError) as e:  # recognise without hints rather than fail
+            log.warning("saaras:v4 with keyterms rejected (%s); retrying saaras:v3 without hints", e.body)
+            result = await self.client.speech_to_text.transcribe(**request, model="saaras:v3")
         return Heard(result.transcript.strip(), result.language_code or ENGLISH)
 
     async def translate(self, english: str, language: str) -> str:

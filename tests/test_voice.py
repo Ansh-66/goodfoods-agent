@@ -96,6 +96,7 @@ def test_translation_keeps_lists_and_clean_spacing_in_every_language(language):
 
 
 def test_area_names_are_sent_as_hints_and_dropped_if_rejected():
-    assert "Koramangala" in KEYTERMS
+    assert {"Koramangala", "Italian"} <= set(KEYTERMS)
+    assert len(KEYTERMS) <= 50 and all(len(term) <= 64 for term in KEYTERMS)  # the API's limits
     heard = asyncio.run(voice_with(FakeSarvam(reject_keyterms=True)).listen(b"audio"))
     assert heard.english == "Table for two tomorrow"
