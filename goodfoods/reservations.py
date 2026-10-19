@@ -2,6 +2,9 @@
 
 Every write takes the database write lock (BEGIN IMMEDIATE) *before* checking
 seats, so check-then-write is atomic and two guests cannot book the last table.
+
+Each write also accepts dry_run=True: every check runs, nothing is written. The
+agent uses it to validate a write before asking the guest to confirm it.
 """
 
 import re
@@ -68,11 +71,18 @@ def _summary(conn, reservation_id: str) -> dict:
     return {"ok": True, "reservation_id": row["id"], **{k: row[k] for k in keys}}
 
 
-def _write(conn, check_seats, statement: str, params: tuple) -> None:
-    """Run `check_seats` and `statement` in one transaction that holds the write lock."""
+VALID = {"ok": True, "dry_run": True, "message": "All checks passed; nothing was written."}
+
+
+def _write(conn, check_seats, statement: str, params: tuple, dry_run: bool = False) -> None:
+    """Run `check_seats` and `statement` in one transaction that holds the write lock.
+    A dry run checks seats and rolls back without executing `statement`."""
     conn.execute("BEGIN IMMEDIATE")
     try:
         check_seats()
+        if dry_run:
+            conn.execute("ROLLBACK")
+            return
         conn.execute(statement, params)
         conn.execute("COMMIT")
     except BaseException:
@@ -81,7 +91,15 @@ def _write(conn, check_seats, statement: str, params: tuple) -> None:
 
 
 def make_reservation(
-    conn, restaurant_id, date_str, time_str, party_size, guest_name, guest_phone=None, special_requests=None
+    conn,
+    restaurant_id,
+    date_str,
+    time_str,
+    party_size,
+    guest_name,
+    guest_phone=None,
+    special_requests=None,
+    dry_run=False,
 ) -> dict:
     r = get_restaurant(conn, restaurant_id)
     day, start = parse_date(date_str), parse_time(time_str)
@@ -110,8 +128,9 @@ def make_reservation(
         "guest_phone, special_requests, status, created_at, updated_at) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?)",
         (res_id, r["id"], day.isoformat(), to_hhmm(start), party, name, phone, requests, stamp, stamp),
+        dry_run,
     )
-    return _summary(conn, res_id)
+    return VALID if dry_run else _summary(conn, res_id)
 
 
 def _load(conn, reservation_id) -> sqlite3.Row:
@@ -138,7 +157,7 @@ def get_reservation(conn, reservation_id) -> dict:
     return _summary(conn, _load(conn, reservation_id)["id"])
 
 
-def modify_reservation(conn, reservation_id, date_str=None, time_str=None, party_size=None) -> dict:
+def modify_reservation(conn, reservation_id, date_str=None, time_str=None, party_size=None, dry_run=False) -> dict:
     """Change date, time or party size at the same outlet. Moving outlets is cancel + book."""
     row = _load(conn, reservation_id)
     _check_changeable(conn, row)
@@ -164,13 +183,16 @@ def modify_reservation(conn, reservation_id, date_str=None, time_str=None, party
         check_seats,
         "UPDATE reservations SET date = ?, time = ?, party_size = ?, updated_at = ? WHERE id = ?",
         (day.isoformat(), to_hhmm(start), party, now().isoformat(timespec="seconds"), row["id"]),
+        dry_run,
     )
-    return _summary(conn, row["id"])
+    return VALID if dry_run else _summary(conn, row["id"])
 
 
-def cancel_reservation(conn, reservation_id) -> dict:
+def cancel_reservation(conn, reservation_id, dry_run=False) -> dict:
     row = _load(conn, reservation_id)
     _check_changeable(conn, row)
+    if dry_run:
+        return VALID
     conn.execute(
         "UPDATE reservations SET status = 'cancelled', updated_at = ? WHERE id = ?",
         (now().isoformat(timespec="seconds"), row["id"]),

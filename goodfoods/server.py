@@ -31,6 +31,8 @@ Date = Annotated[str, Field(description="YYYY-MM-DD")]
 Time = Annotated[str, Field(description="24-hour HH:MM on the hour or half hour, e.g. 19:30")]
 RestaurantId = Annotated[str, Field(description="Outlet id, e.g. R012")]
 ReservationId = Annotated[str, Field(description="Booking id, e.g. GF7K2QXM")]
+# Set by the agent loop, never by the model: the loop strips it from the schemas it sends.
+DryRun = Annotated[bool, Field(description="Check everything, write nothing")]
 FEATURE_HELP = (
     "Any of: veg_friendly, outdoor_seating, private_dining, kid_friendly, bar, "
     "live_music, parking, wheelchair_accessible"
@@ -102,10 +104,19 @@ def make_reservation(
     guest_name: str,
     guest_phone: str | None = None,
     special_requests: str | None = None,
+    dry_run: DryRun = False,
 ) -> dict:
     """Book a table. Returns the booking id."""
     return _run(
-        reservations.make_reservation, restaurant_id, date, time, party_size, guest_name, guest_phone, special_requests
+        reservations.make_reservation,
+        restaurant_id,
+        date,
+        time,
+        party_size,
+        guest_name,
+        guest_phone,
+        special_requests,
+        dry_run,
     )
 
 
@@ -121,16 +132,17 @@ def modify_reservation(
     date: Date | None = None,
     time: Time | None = None,
     party_size: int | None = None,
+    dry_run: DryRun = False,
 ) -> dict:
     """Change the date, time or party size of a booking at the same outlet.
     If the new slot is full, the booking is left unchanged."""
-    return _run(reservations.modify_reservation, reservation_id, date, time, party_size)
+    return _run(reservations.modify_reservation, reservation_id, date, time, party_size, dry_run)
 
 
 @mcp.tool()
-def cancel_reservation(reservation_id: ReservationId) -> dict:
+def cancel_reservation(reservation_id: ReservationId, dry_run: DryRun = False) -> dict:
     """Cancel a booking."""
-    return _run(reservations.cancel_reservation, reservation_id)
+    return _run(reservations.cancel_reservation, reservation_id, dry_run)
 
 
 @mcp.tool()

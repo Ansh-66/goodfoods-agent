@@ -8,7 +8,7 @@ from mcp.client.client import Client
 
 from goodfoods.agent import Conversation, run_turn
 from goodfoods.agent.llm import MalformedToolCall, ModelReply, ToolRequest
-from goodfoods.agent.loop import FALLBACK_REPLY, MAX_STEPS
+from goodfoods.agent.loop import FALLBACK_REPLY, MAX_STEPS, tool_schemas
 from goodfoods.agent.prompt import build_system_prompt
 from goodfoods.server import mcp
 
@@ -20,6 +20,7 @@ BOOKING = {
     "time": "13:00",
     "party_size": 2,
     "guest_name": "Ansh",
+    "guest_phone": "9876543210",
 }
 
 
@@ -65,7 +66,8 @@ def test_write_runs_only_after_the_guest_confirms(conn):
     )
     assert first.steps[0].held_for_confirmation and booking_count(conn) == 0
 
-    second = play(conv, "yes", ScriptedModel(call("make_reservation", BOOKING), say("Booked.")))
+    same_number = {**BOOKING, "guest_phone": "+91 98765 43210"}  # repeated in another format
+    second = play(conv, "yes", ScriptedModel(call("make_reservation", same_number), say("Booked.")))
     assert second.steps[0].result["ok"] and booking_count(conn) == 1
 
 
@@ -84,6 +86,22 @@ def test_changed_details_need_a_fresh_confirmation(conn):
     later = {**BOOKING, "time": "13:30"}
     turn = play(conv, "Actually 1:30", ScriptedModel(call("make_reservation", later), say("Confirm 13:30?")))
     assert turn.steps[0].held_for_confirmation and booking_count(conn) == 0
+
+
+def test_write_that_would_fail_is_rejected_before_any_read_back(conn):
+    conv = Conversation()
+    bad_phone = {**BOOKING, "guest_phone": "724572578"}  # 9 digits
+    turn = play(conv, "Book it", ScriptedModel(call("make_reservation", bad_phone), say("Which number?")))
+    assert turn.steps[0].result["error"] == "invalid_phone" and not turn.steps[0].held_for_confirmation
+    assert conv.held_write is None and booking_count(conn) == 0
+
+
+def test_model_never_sees_the_dry_run_switch(conn):
+    async def go():
+        async with Client(mcp) as session:
+            return tool_schemas((await session.list_tools()).tools)
+
+    assert "dry_run" not in json.dumps(asyncio.run(go()))
 
 
 def test_bad_calls_are_returned_to_the_model(conn):

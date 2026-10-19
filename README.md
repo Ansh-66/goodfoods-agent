@@ -53,7 +53,7 @@ streamlit run streamlit_app.py
 **Checks**
 
 ```bash
-pytest                             # 41 tests, no API key needed (the model is scripted)
+pytest                             # 43 tests, no API key needed (the model is scripted)
 ruff check . && ruff format --check .
 python evals/run_eval.py           # live evaluation against Groq; uses a large share of the free daily quota
 ```
@@ -114,7 +114,7 @@ One guest message is one turn (`goodfoods/agent/loop.py`):
 
 The model decides intent; there are no keyword rules on the guest's text. Code enforces what must not depend on the model getting it right:
 
-- **Confirmation gate.** `make_reservation`, `modify_reservation` and `cancel_reservation` never run on the model's first request. The loop holds the write and returns `confirmation_required` with the details, so the model reads them back to the guest. The write runs only when the model requests the same write again in a later turn, after the guest has replied. A model that tries to confirm its own write in the same turn is held again, and changed details need a fresh confirmation.
+- **Confirmation gate.** `make_reservation`, `modify_reservation` and `cancel_reservation` never run on the model's first request. The loop first dry-runs the write (every server check, nothing written): if it would fail, say an invalid phone number or a full slot, the model gets that error at once, so the guest is never asked to confirm a write that cannot succeed. If it would succeed, the loop holds it and returns `confirmation_required` with the details, so the model reads them back. The write runs only when the model requests the same write again in a later turn, after the guest has replied. A model that tries to confirm its own write in the same turn is held again, and changed details (including the phone number) need a fresh confirmation. The `dry_run` switch is stripped from the schemas the model sees.
 - **Errors are results.** Rule violations (past date, closed, full, party too large) come back as `{"ok": false, "error": ..., "message": ...}` with valid options where useful (areas served, cuisines served, alternative times). Unknown tools, unparseable arguments and schema errors also go back to the model, which corrects itself or asks the guest.
 - **Malformed calls.** When Groq cannot parse the model's tool call (`tool_use_failed`), the loop retries once with a nudge, then falls back to asking the guest to rephrase.
 - **Token budget.** Groq's free tier allows 8,000 tokens per minute and 200,000 per day on this model. Tool schemas (about 1,200 tokens) are stripped of redundant keys, tool results are compacted and capped at 2,000 characters, and only the last 6 guest turns are sent. The Groq SDK retries rate-limited calls, honouring `retry-after`.
@@ -206,7 +206,7 @@ goodfoods/
   db.py, setup_db.py, generate_data.py, config.py, errors.py
 streamlit_app.py    chat UI
 evals/              cases.json, run_eval.py, results
-tests/              41 tests: rules, MCP server, agent loop, voice layer, UI, eval harness
+tests/              43 tests: rules, MCP server, agent loop, voice layer, UI, eval harness
 docs/use_case.md    business use-case document
 data/restaurants.json
 ```

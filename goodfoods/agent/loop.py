@@ -11,9 +11,12 @@ The model decides intent: no keyword rules on the guest's text anywhere. Code
 enforces what must not depend on the model getting it right:
 
 - Confirmation gate. A write (book, modify, cancel) never runs on the model's
-  first request. The loop holds it and tells the model to read the details back;
-  it runs only when the model requests the same write again after the guest has
-  replied. So nothing is written without the guest seeing it first.
+  first request. The loop dry-runs it (every server check, nothing written): if
+  it would fail, the model gets the error now; if it would succeed, the loop
+  holds it and tells the model to read the details back. It runs only when the
+  model requests the same write again after the guest has replied. So nothing is
+  written without the guest seeing it, and the guest never confirms a write that
+  cannot succeed.
 - Recovery. Unknown tools, unparseable arguments and schema errors go back to
   the model as tool results so it can correct itself; a call the provider could
   not parse is retried once with a nudge.
@@ -23,6 +26,7 @@ enforces what must not depend on the model getting it right:
 
 import json
 import logging
+import re
 from dataclasses import dataclass, field
 
 from mcp.client.client import Client
@@ -39,7 +43,7 @@ RESULT_CHARS = 2000  # cap on one tool result
 
 # The fields that identify a write: the guest confirms these.
 WRITE_KEYS = {
-    "make_reservation": ("restaurant_id", "date", "time", "party_size", "guest_name"),
+    "make_reservation": ("restaurant_id", "date", "time", "party_size", "guest_name", "guest_phone"),
     "modify_reservation": ("reservation_id", "date", "time", "party_size"),
     "cancel_reservation": ("reservation_id",),
 }
@@ -83,7 +87,7 @@ def tool_schemas(tools) -> list[dict]:
 
     def strip(node):
         if isinstance(node, dict):
-            return {k: strip(v) for k, v in node.items() if k != "title"}
+            return {k: strip(v) for k, v in node.items() if k not in ("title", "dry_run")}
         if isinstance(node, list):
             return [strip(v) for v in node]
         return node
@@ -100,6 +104,8 @@ def tool_schemas(tools) -> list[dict]:
 def write_identity(name: str, args: dict) -> str:
     """Same booking -> same string, despite cosmetic differences in how the model repeats it."""
     fields = {k: str(args[k]).strip().lower() for k in WRITE_KEYS[name] if args.get(k) not in (None, "")}
+    if "guest_phone" in fields:  # "+91 72045 72578" and "7204572578" are the same number
+        fields["guest_phone"] = re.sub(r"\D", "", fields["guest_phone"])[-10:]
     return name + json.dumps(fields, sort_keys=True)
 
 
@@ -115,9 +121,14 @@ async def _execute(session: Client, conv: Conversation, name: str, args: dict, k
         return ToolStep(name, args, {"ok": False, "error": "unknown_tool", "message": f"No tool '{name}'."})
 
     if name in WRITE_KEYS:
+        args = {k: v for k, v in args.items() if k != "dry_run"}  # the loop decides, never the model
         identity = write_identity(name, args)
         confirmed = identity == conv.held_write and conv.guest_turns > conv.held_at_turn
         if not confirmed:
+            check = await _call(session, name, {**args, "dry_run": True})
+            if not check.get("ok"):  # would fail: tell the model now, before any read-back
+                conv.held_write = None
+                return ToolStep(name, args, check)
             conv.held_write, conv.held_at_turn = identity, conv.guest_turns
             held = {
                 "ok": False,
@@ -129,11 +140,15 @@ async def _execute(session: Client, conv: Conversation, name: str, args: dict, k
             return ToolStep(name, args, held, held_for_confirmation=True)
         conv.held_write = None
 
+    return ToolStep(name, args, await _call(session, name, args))
+
+
+async def _call(session: Client, name: str, args: dict) -> dict:
     result = await session.call_tool(name, args)
     text = result.content[0].text if result.content else "{}"
     if result.is_error:  # the SDK rejected the arguments against the schema
-        return ToolStep(name, args, {"ok": False, "error": "invalid_arguments", "message": text[:500]})
-    return ToolStep(name, args, json.loads(text))
+        return {"ok": False, "error": "invalid_arguments", "message": text[:500]}
+    return json.loads(text)
 
 
 async def run_turn(conv: Conversation, guest_text: str, model: ChatModel, session: Client) -> TurnResult:
