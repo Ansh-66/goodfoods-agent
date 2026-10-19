@@ -59,7 +59,10 @@
           "args": {"recommend_restaurants": {"date": "2026-10-23", "time": "20:00", "party_size": 4}, "check_availability": {"restaurant_id": "R001", "date": "2026-10-23", "time": "20:00", "party_size": 4}}
         }
       ],
-      "final": {"no_writes": true, "reply_contains_any": ["BTM", "Ulsoor", "Bannerghatta"]}
+      "final": {
+        "no_writes": true,
+        "reply_contains_any": [["full", "booked", "not available", "unavailable", "no table"], ["BTM", "Ulsoor", "Bannerghatta"]]
+      }
     },
     {
       "id": "full-other-time",

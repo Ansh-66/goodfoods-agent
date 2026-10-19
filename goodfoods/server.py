@@ -23,6 +23,7 @@ from . import availability, catalog, handoff, reservations
 from .config import db_path
 from .db import connect
 from .errors import BookingError
+from .generate_data import CONCEPTS
 from .setup_db import main as build_db
 
 mcp = MCPServer("goodfoods-reservations")
@@ -34,6 +35,8 @@ RestaurantId = Annotated[str, Field(description="Outlet id from recommend_restau
 ReservationId = Annotated[str, Field(description="Booking id, e.g. GF7K2QXM")]
 # Set by the agent loop, never by the model: the loop strips it from the schemas it sends.
 DryRun = Annotated[bool, Field(description="Check everything, write nothing")]
+# The sub-brands, so the model recognises "Wok Street in Whitefield" as a named outlet, not just an area.
+NAME_HELP = "A GoodFoods brand or outlet the guest named: " + ", ".join(c[0] for c in CONCEPTS)
 FEATURE_HELP = (
     "Any of: veg_friendly, outdoor_seating, private_dining, kid_friendly, bar, "
     "live_music, parking, wheelchair_accessible"
@@ -63,7 +66,7 @@ def recommend_restaurants(
     max_price_band: Annotated[int | None, Field(description="1 budget to 4 fine dining")] = None,
     features: Annotated[list[str] | None, Field(description=FEATURE_HELP)] = None,
     occasion: Annotated[str | None, Field(description="e.g. birthday, date night, business")] = None,
-    name: Annotated[str | None, Field(description="Part of an outlet name")] = None,
+    name: Annotated[str | None, Field(description=NAME_HELP)] = None,
     limit: int = 3,
 ) -> dict:
     """Find and rank GoodFoods outlets for the guest, with a reason for each.

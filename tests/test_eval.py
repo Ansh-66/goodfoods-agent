@@ -78,6 +78,18 @@ def test_either_alternative_tool_passes_and_outlets_match_by_name(conn):
     assert asyncio.run(run_eval.main(["--case", "outlet-info"], model=by_name))["args_correct"] == 1
 
 
+def test_asking_which_outlet_does_not_pass_as_offering_alternatives(conn):
+    def run(reply):
+        check = {"restaurant_id": "R001", "date": "2026-10-23", "time": "20:00", "party_size": 4}
+        model = Scripted(
+            ModelReply(None, [ToolRequest("c1", "check_availability", json.dumps(check))]), ModelReply(reply)
+        )
+        return asyncio.run(run_eval.main(["--case", "full-nearby-outlet"], model=model))["case_success"]
+
+    assert run("Which Green Bowl? We have BTM Layout, Ulsoor and Bannerghatta Road.") == 0
+    assert run("Green Bowl Koramangala is full at 8 pm, but Green Bowl BTM Layout is free.") == 1
+
+
 class QuotaRunsOut:
     """Answers in plain text, then hits the rate limit after `budget` calls (once only)."""
 

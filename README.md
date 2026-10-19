@@ -53,7 +53,7 @@ streamlit run streamlit_app.py
 **Checks**
 
 ```bash
-pytest                             # 67 tests, no API key needed (the model is scripted)
+pytest                             # 68 tests, no API key needed (the model is scripted)
 ruff check . && ruff format --check .
 python evals/run_eval.py           # live evaluation against Groq; resumable if the free daily quota runs out
 ```
@@ -158,6 +158,7 @@ The first full run (commit `b14fa96`) scored 11/16 cases, 17/22 turns for tool s
 |---|---|---|
 | "Is Wok Street free at 8?" answered without the other times | The model answers from one `recommend_restaurants` call; that call ranked free outlets first, so the full outlet the guest named dropped out, and only `check_availability` returned other times | A named outlet keeps its place in the ranking, and a full outlet in a recommendation lists its nearest free times. The shortest path the model takes is now complete, instead of a prompt rule fighting it |
 | `get_restaurant_details("R012")`, then `("WokStreetWhitefield")` | The schema's example id (`R012`) was copied; then the name was passed as an id | No example id in the schema; outlets resolve by name as well as id |
+| On re-run, "Wok Street in Whitefield" searched by area only; "GoodFoods Green Bowl" was ambiguous and the agent asked "which one?" although the guest had said Koramangala | The schema never said which words are outlet names, and the ambiguity error told the model to ask | The `name` parameter lists the 12 GoodFoods brands; the ambiguity error says to use the area the guest gave. That case had passed only because the candidate list happened to name the expected outlets, so its check now also requires the reply to say the outlet is full |
 | Booking modification not attempted | PENDING: diagnosis from the run's transcript | PENDING |
 | Party-of-25 case failed on "3,640 bookings for Rohan" | **Harness bug:** Rohan is also a seeded guest name | Count only bookings made during the case |
 | Complaint case failed on an early hand-off attempt | **Harness too strict:** the tool rejected the attempt for missing details, the agent then asked for them and created exactly one correct ticket | Allow the attempt; the outcome checks still require exactly one ticket with the right name and phone |
@@ -222,7 +223,7 @@ goodfoods/
   db.py, setup_db.py, generate_data.py, config.py, errors.py
 streamlit_app.py    chat UI
 evals/              cases.json, run_eval.py, results
-tests/              67 tests: rules, MCP server, agent loop, voice layer, UI, eval harness
+tests/              68 tests: rules, MCP server, agent loop, voice layer, UI, eval harness
 docs/use_case.md    business use-case document
 data/restaurants.json
 ```

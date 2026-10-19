@@ -82,7 +82,8 @@ def get_restaurant(conn: sqlite3.Connection, restaurant_id: str) -> sqlite3.Row:
     if matches:
         raise BookingError(
             "ambiguous_restaurant",
-            f"'{restaurant_id}' matches {len(matches)} outlets. Ask the guest which one.",
+            f"'{restaurant_id}' matches {len(matches)} outlets in different areas. If the guest named an "
+            "area, call again with that outlet's id; ask the guest only if they did not say which.",
             candidates=[{"restaurant_id": r["id"], "name": r["name"]} for r in matches[:8]],
         )
     raise BookingError(
