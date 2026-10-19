@@ -50,3 +50,22 @@ def test_booking_holds_seats_for_exactly_90_minutes(conn, free_slot):
     reservations.make_reservation(conn, rid, FRIDAY, t, 2, "Guest")
     after = av.occupancy(conn, rid, day)
     assert [after.get(s, 0) - before.get(s, 0) for s in slots] == [0, 2, 2, 2, 0]
+
+
+@pytest.mark.parametrize(
+    "name, expected",
+    [
+        ("R004", "R004"),
+        ("WokStreetWhitefield", "R004"),  # what the model actually sent in the eval
+        ("GoodFoods Green Bowl, Koramangala", "R001"),
+        ("Andhra Spice Indiranagar", "R002"),  # exact name wins over "... Indiranagar II"
+        ("Andhra Spice Indiranagar II", "R074"),
+    ],
+)
+def test_outlets_resolve_by_id_or_name(conn, name, expected):
+    assert av.get_restaurant(conn, name)["id"] == expected
+
+
+def test_ambiguous_or_unknown_names_are_rejected(conn):
+    assert error_code(av.get_restaurant, conn, "Trattoria") == "ambiguous_restaurant"
+    assert error_code(av.get_restaurant, conn, "Noma") == "restaurant_not_found"

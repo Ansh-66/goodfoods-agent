@@ -63,14 +63,32 @@ def parse_time(value: str) -> int:
 # ------------------------------------------------------------------ outlet rules
 
 
+def _squash(text: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", text.lower())
+
+
 def get_restaurant(conn: sqlite3.Connection, restaurant_id: str) -> sqlite3.Row:
-    row = conn.execute("SELECT * FROM restaurants WHERE id = ?", (str(restaurant_id).strip().upper(),)).fetchone()
-    if row is None:
+    """An outlet by id ("R004") or by name ("Wok Street Whitefield"). Models often pass the
+    name they heard instead of looking the id up, so a unique name match is accepted."""
+    key = str(restaurant_id).strip()
+    row = conn.execute("SELECT * FROM restaurants WHERE id = ?", (key.upper(),)).fetchone()
+    if row is not None:
+        return row
+    wanted = _squash(key)
+    matches = [r for r in conn.execute("SELECT * FROM restaurants") if wanted and wanted in _squash(r["name"])]
+    exact = [r for r in matches if _squash(r["name"]) in (wanted, "goodfoods" + wanted)]
+    if len(exact) == 1 or len(matches) == 1:
+        return (exact or matches)[0]
+    if matches:
         raise BookingError(
-            "restaurant_not_found",
-            f"No outlet with id '{restaurant_id}'. Ids look like R001; use recommend_restaurants to find one.",
+            "ambiguous_restaurant",
+            f"'{restaurant_id}' matches {len(matches)} outlets. Ask the guest which one.",
+            candidates=[{"restaurant_id": r["id"], "name": r["name"]} for r in matches[:8]],
         )
-    return row
+    raise BookingError(
+        "restaurant_not_found",
+        f"No outlet '{restaurant_id}'. Use recommend_restaurants to find one.",
+    )
 
 
 def opening_minutes(r: sqlite3.Row) -> tuple[int, int]:
@@ -156,17 +174,19 @@ def distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return 6371 * 2 * math.asin(math.sqrt(a))
 
 
+def free_times_near(conn, r, day: date, start: int, party: int, exclude_id: str | None = None) -> list[str]:
+    """Up to 3 free start times at this outlet within +/-2 hours, nearest first."""
+    offsets = sorted(
+        range(-ALTERNATIVE_WINDOW_MIN, ALTERNATIVE_WINDOW_MIN + 1, SLOT_MINUTES), key=lambda d: (abs(d), d)
+    )
+    return [to_hhmm(start + d) for d in offsets if d and is_bookable(conn, r, day, start + d, party, exclude_id)][:3]
+
+
 def find_alternatives(conn, r, day: date, start: int, party: int, exclude_id: str | None = None) -> dict:
     """Overflow routing for a full outlet: (a) the nearest free times at the same outlet
     within +/-2 hours, and (b) the same time at other outlets within NEARBY_RADIUS_KM,
     same cuisine first, then by distance. Done in code so the model cannot skip it."""
-    offsets = sorted(
-        range(-ALTERNATIVE_WINDOW_MIN, ALTERNATIVE_WINDOW_MIN + 1, SLOT_MINUTES),
-        key=lambda d: (abs(d), d),
-    )
-    other_times = [
-        to_hhmm(start + d) for d in offsets if d and is_bookable(conn, r, day, start + d, party, exclude_id)
-    ][:3]
+    other_times = free_times_near(conn, r, day, start, party, exclude_id)
 
     my_cuisines = set(json.loads(r["cuisines"]))
     nearby = []

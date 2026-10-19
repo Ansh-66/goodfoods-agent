@@ -11,6 +11,7 @@ import re
 from .availability import (
     check_party_size,
     distance_km,
+    free_times_near,
     get_restaurant,
     is_bookable,
     last_seating,
@@ -163,7 +164,8 @@ def recommend_restaurants(
     occasion_text = "" if is_blank(occasion) else str(occasion).lower()
     occasion_feats = {f for word, fs in OCCASION_FEATURES.items() if word in occasion_text for f in fs}
 
-    # Soft ranking: rating, minus distance, plus occasion fit; free outlets first.
+    # Soft ranking: rating, minus distance, plus occasion fit. In an open search free outlets come
+    # first; when the guest named an outlet it keeps its place, so a full one is still reported.
     scored = []
     for r in rows:
         feats = json.loads(r["features"])
@@ -171,7 +173,8 @@ def recommend_restaurants(
         fits = sorted(occasion_feats & set(feats))
         available = None if day is None else is_bookable(conn, r, day, start, party or 2)
         score = r["rating"] - KM_PENALTY * (km or 0) + OCCASION_BONUS * len(fits)
-        scored.append((available is not False, score, r, km, fits, available))
+        free_first = is_blank(name) and available is not False
+        scored.append((free_first, score, r, km, fits, available))
     scored.sort(key=lambda s: (s[0], s[1]), reverse=True)
 
     results = []
@@ -184,8 +187,11 @@ def recommend_restaurants(
             reason.append("has " + ", ".join(f.replace("_", " ") for f in wanted))
         if fits:
             reason.append("suits the occasion: " + ", ".join(f.replace("_", " ") for f in fits))
+        other_times = [] if available is not False else free_times_near(conn, r, day, start, party or 2)
         if available is not None:
             reason.append(f"{'free' if available else 'full'} at {to_hhmm(start)}")
+        if other_times:
+            reason.append("free instead at " + ", ".join(other_times))
         item = {
             "restaurant_id": r["id"],
             "name": r["name"],
@@ -200,6 +206,8 @@ def recommend_restaurants(
             item["distance_km"] = round(km, 1)
         if available is not None:
             item["available"] = available
+        if other_times:
+            item["other_times"] = other_times  # so one call answers "is X free?" completely
         results.append(item)
 
     out = {"ok": True, "count": len(results), "restaurants": results}

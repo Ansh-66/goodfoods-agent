@@ -53,7 +53,7 @@ streamlit run streamlit_app.py
 **Checks**
 
 ```bash
-pytest                             # 59 tests, no API key needed (the model is scripted)
+pytest                             # 67 tests, no API key needed (the model is scripted)
 ruff check . && ruff format --check .
 python evals/run_eval.py           # live evaluation against Groq; resumable if the free daily quota runs out
 ```
@@ -91,7 +91,7 @@ flowchart LR
 
 | Tool | Purpose |
 |---|---|
-| `recommend_restaurants` | Rank outlets by area, cuisine, party size, price, features and occasion, with a reason each; free outlets first when a date and time are given |
+| `recommend_restaurants` | Rank outlets by area, cuisine, party size, price, features and occasion, with a reason each. With a date and time, free outlets come first in an open search, and a full outlet lists its nearest free times |
 | `get_restaurant_details` | Address, phone, hours, last booking time, features, policies |
 | `check_availability` | Is there a table? If not, other free times at that outlet and nearby outlets free at that time |
 | `make_reservation` | Book; returns a booking id |
@@ -99,6 +99,8 @@ flowchart LR
 | `modify_reservation` | Change date, time or party size; a full slot leaves the booking unchanged and returns alternatives |
 | `cancel_reservation` | Cancel |
 | `request_human_handoff` | Staff ticket for complaints, groups over 12 and events |
+
+**Outlets by id or name.** Every `restaurant_id` argument also accepts the outlet's name ("Wok Street Whitefield"): a unique match resolves, an ambiguous one returns the candidates with their ids.
 
 **Capacity model.** Each outlet has a number of seats. Bookings start on 30-minute slots and hold their seats for 90 minutes; a party fits when every slot it covers has room. Availability is computed from confirmed bookings on each request, never stored. The seat check and the write run in one `BEGIN IMMEDIATE` transaction, so two guests cannot take the last table.
 
@@ -148,7 +150,19 @@ The system prompt is in `goodfoods/agent/prompt.py` and is rebuilt every turn. T
 - **Argument accuracy** (per checked call): the first call to the tool carries the expected arguments (dates, times, party size, outlet, ids).
 - **Case success:** all turns selected correctly, and the final database state and reply pass their checks (booking created, party size changed, no writes, ticket created, alternative mentioned, and no refusal of an in-scope question).
 
-PENDING: results table from `evals/results.md` after the live run.
+### What the first run found
+
+The first full run (commit `b14fa96`) scored 11/16 cases, 17/22 turns for tool selection and 8/12 checked calls for arguments. Each failure was traced to a cause before anything was changed:
+
+| Failure | Cause | Change |
+|---|---|---|
+| "Is Wok Street free at 8?" answered without the other times | The model answers from one `recommend_restaurants` call; that call ranked free outlets first, so the full outlet the guest named dropped out, and only `check_availability` returned other times | A named outlet keeps its place in the ranking, and a full outlet in a recommendation lists its nearest free times. The shortest path the model takes is now complete, instead of a prompt rule fighting it |
+| `get_restaurant_details("R012")`, then `("WokStreetWhitefield")` | The schema's example id (`R012`) was copied; then the name was passed as an id | No example id in the schema; outlets resolve by name as well as id |
+| Booking modification not attempted | PENDING: diagnosis from the run's transcript | PENDING |
+| Party-of-25 case failed on "3,640 bookings for Rohan" | **Harness bug:** Rohan is also a seeded guest name | Count only bookings made during the case |
+| Complaint case failed on an early hand-off attempt | **Harness too strict:** the tool rejected the attempt for missing details, the agent then asked for them and created exactly one correct ticket | Allow the attempt; the outcome checks still require exactly one ticket with the right name and phone |
+
+PENDING: results table from the final run.
 
 A full run saves each finished case, so when the free tier's daily token limit stops it, the same command resumes the next day. Saved progress is reused only if the git commit, the model and `cases.json` are unchanged, so a report never mixes two versions of the agent; the commit is printed in the report.
 
@@ -208,7 +222,7 @@ goodfoods/
   db.py, setup_db.py, generate_data.py, config.py, errors.py
 streamlit_app.py    chat UI
 evals/              cases.json, run_eval.py, results
-tests/              59 tests: rules, MCP server, agent loop, voice layer, UI, eval harness
+tests/              67 tests: rules, MCP server, agent loop, voice layer, UI, eval harness
 docs/use_case.md    business use-case document
 data/restaurants.json
 ```

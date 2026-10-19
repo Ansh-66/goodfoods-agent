@@ -32,3 +32,12 @@ def test_free_outlets_rank_first(conn):
     flags = [r["available"] for r in found["restaurants"]]
     assert flags == sorted(flags, reverse=True)
     assert "R001" not in [r["restaurant_id"] for r in found["restaurants"] if r["available"]]
+
+
+def test_a_named_full_outlet_is_reported_with_its_free_times(conn):
+    found = catalog.recommend_restaurants(
+        conn, area="Whitefield", name="Wok Street", party_size=2, date_str=FRIDAY, time_str="20:00"
+    )["restaurants"]
+    first = found[0]
+    assert (first["restaurant_id"], first["available"]) == ("R004", False)
+    assert "18:30" in first["other_times"] and "free instead at" in first["reason"]

@@ -66,6 +66,18 @@ def test_seeded_guests_sharing_a_name_do_not_count_as_new_bookings(conn):
     assert asyncio.run(run_eval.main(["--case", "large-group-handoff"], model=model))["case_success"] == 1
 
 
+def test_either_alternative_tool_passes_and_outlets_match_by_name(conn):
+    recommend = {"area": "Whitefield", "name": "Wok Street", "party_size": 2, "date": "2026-10-23", "time": "20:00"}
+    model = Scripted(
+        ModelReply(None, [ToolRequest("c1", "recommend_restaurants", json.dumps(recommend))]),
+        ModelReply("Wok Street, Whitefield is full at 8 pm; 6:30 pm or 9:30 pm are free."),
+    )
+    assert asyncio.run(run_eval.main(["--case", "full-other-time"], model=model))["case_success"] == 1
+
+    by_name = Scripted(lookup({"restaurant_id": "WokStreetWhitefield"}), ModelReply("It closes at 23:00."))
+    assert asyncio.run(run_eval.main(["--case", "outlet-info"], model=by_name))["args_correct"] == 1
+
+
 class QuotaRunsOut:
     """Answers in plain text, then hits the rate limit after `budget` calls (once only)."""
 

@@ -6,11 +6,14 @@ real MCP server, in memory instead of over stdio, which is the same protocol
 without a subprocess per turn.
 
 Metrics:
-- Tool selection: a turn is correct when every required tool was called and no
-  tool outside required + allowed was called.
+- Tool selection: a turn is correct when every required tool was called, at least
+  one of any "required_any" tools was called, and nothing outside those and the
+  allowed tools was called.
 - Argument accuracy: for each tool with an argument spec, the first call to it
   in that turn carries every listed argument (strings compared case-insensitively
-  as substrings, phone numbers by digits, numbers exactly).
+  as substrings, phone numbers by digits, numbers exactly, outlets by the outlet the
+  value resolves to, since the server accepts names as well as ids). A tool that is
+  only one of several acceptable alternatives is checked only if it was called.
 - Case success: every turn's selection is correct and the final checks on the
   database and the last reply pass.
 
@@ -38,6 +41,7 @@ import tempfile
 import time
 from contextlib import closing
 from datetime import datetime
+from functools import partial
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -49,9 +53,10 @@ CASES_TEXT = (HERE / "cases.json").read_text(encoding="utf-8")
 CASES = json.loads(CASES_TEXT)
 os.environ["GOODFOODS_NOW"] = CASES["now"]  # before goodfoods reads the clock
 
-from goodfoods import reservations  # noqa: E402
+from goodfoods import availability, reservations  # noqa: E402
 from goodfoods.agent import ChatModel, Conversation, GroqModel, run_turn  # noqa: E402
 from goodfoods.db import connect  # noqa: E402
+from goodfoods.errors import BookingError  # noqa: E402
 from goodfoods.server import mcp  # noqa: E402
 from goodfoods.setup_db import main as build_db  # noqa: E402
 
@@ -67,12 +72,14 @@ def arg_matches(expected, actual) -> bool:
     return str(expected).lower() in str(actual).lower()
 
 
-def check_args(spec: dict, actual: dict) -> list[str]:
+def check_args(spec: dict, actual: dict, resolve_outlet) -> list[str]:
     """Names of the arguments in `spec` that `actual` gets wrong."""
     wrong = []
     for key, expected in spec.items():
         value = actual.get(key)
-        if key.endswith("phone"):
+        if key == "restaurant_id":
+            ok = value is not None and resolve_outlet(value) == expected
+        elif key.endswith("phone"):
             ok = value is not None and re.sub(r"\D", "", str(value)).endswith(str(expected))
         else:
             ok = arg_matches(expected, value)
@@ -81,14 +88,20 @@ def check_args(spec: dict, actual: dict) -> list[str]:
     return wrong
 
 
-def score_turn(spec: dict, steps) -> dict:
+def score_turn(spec: dict, steps, resolve_outlet) -> dict:
     called = [s.name for s in steps]
-    required, allowed = set(spec["required"]), set(spec["required"]) | set(spec.get("allowed", []))
-    missing, unexpected = sorted(required - set(called)), sorted(set(called) - allowed)
+    required, any_of = set(spec["required"]), set(spec.get("required_any", []))
+    allowed = required | any_of | set(spec.get("allowed", []))
+    missing = sorted(required - set(called))
+    if any_of and not any_of & set(called):
+        missing.append(" or ".join(sorted(any_of)))
+    unexpected = sorted(set(called) - allowed)
     arg_results = {}
     for tool, arg_spec in spec.get("args", {}).items():
         first = next((s for s in steps if s.name == tool), None)
-        arg_results[tool] = ["not called"] if first is None else check_args(arg_spec, first.arguments)
+        if first is None and tool in any_of:
+            continue  # an alternative the model did not take
+        arg_results[tool] = ["not called"] if first is None else check_args(arg_spec, first.arguments, resolve_outlet)
     return {
         "guest": spec["guest"],
         "called": called,
@@ -98,6 +111,13 @@ def score_turn(spec: dict, steps) -> dict:
         "args": {tool: not wrong for tool, wrong in arg_results.items()},
         "arg_errors": {tool: wrong for tool, wrong in arg_results.items() if wrong},
     }
+
+
+def resolve_outlet(conn, value) -> str | None:
+    try:
+        return availability.get_restaurant(conn, value)["id"]
+    except BookingError:
+        return None
 
 
 def check_final(
@@ -155,7 +175,7 @@ async def run_case(case: dict, model: ChatModel, seeded_db: Path, workdir: Path)
                 totals["model_calls"] += turn.model_calls
                 totals["tokens"] += turn.input_tokens + turn.output_tokens
                 reply = turn.reply
-                turns.append({**score_turn(spec, turn.steps), "reply": reply})
+                turns.append({**score_turn(spec, turn.steps, partial(resolve_outlet, conn)), "reply": reply})
 
         failures = check_final(case.get("final", {}), conn, seeded, last_seeded_row, reservation_id, reply)
     return {

@@ -53,9 +53,10 @@
       "turns": [
         {
           "guest": "Is GoodFoods Green Bowl in Koramangala free this Friday at 8 pm for 4?",
-          "required": ["check_availability"],
-          "allowed": ["recommend_restaurants", "get_restaurant_details"],
-          "args": {"check_availability": {"restaurant_id": "R001", "date": "2026-10-23", "time": "20:00", "party_size": 4}}
+          "required": [],
+          "required_any": ["check_availability", "recommend_restaurants"],
+          "allowed": ["get_restaurant_details"],
+          "args": {"recommend_restaurants": {"date": "2026-10-23", "time": "20:00", "party_size": 4}, "check_availability": {"restaurant_id": "R001", "date": "2026-10-23", "time": "20:00", "party_size": 4}}
         }
       ],
       "final": {"no_writes": true, "reply_contains_any": ["BTM", "Ulsoor", "Bannerghatta"]}
@@ -66,9 +67,10 @@
       "turns": [
         {
           "guest": "Can I get a table for 2 at Wok Street in Whitefield this Friday at 8 pm?",
-          "required": ["check_availability"],
-          "allowed": ["recommend_restaurants", "get_restaurant_details"],
-          "args": {"check_availability": {"restaurant_id": "R004", "date": "2026-10-23", "time": "20:00", "party_size": 2}}
+          "required": [],
+          "required_any": ["check_availability", "recommend_restaurants"],
+          "allowed": ["get_restaurant_details"],
+          "args": {"recommend_restaurants": {"date": "2026-10-23", "time": "20:00", "party_size": 2}, "check_availability": {"restaurant_id": "R004", "date": "2026-10-23", "time": "20:00", "party_size": 2}}
         }
       ],
       "final": {"no_writes": true, "reply_contains_any": ["18:30", "21:30", "6:30", "9:30"]}
