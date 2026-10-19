@@ -44,7 +44,6 @@ st.set_page_config(page_title="GoodFoods Reservations", page_icon="🍽️", lay
 def reset() -> None:
     st.session_state.conversation = Conversation()
     st.session_state.transcript = []  # dicts: role, text, and optional note, english, audio, turn, seconds
-    st.session_state.mic = 0  # bumping the recorder's key clears it after each voice message
 
 
 if "conversation" not in st.session_state:
@@ -126,14 +125,21 @@ if not st.session_state.transcript:
     with st.chat_message("assistant"):
         st.markdown("Hi! Tell me what you're planning: area, cuisine, date, time and how many people.")
 
-recording = None
-if VOICE_ENABLED:
-    recording = st.audio_input("Or speak, in English or any Indian language", key=f"mic{st.session_state.mic}")
-typed = st.chat_input("Ask about a table") or st.session_state.pop("queued", None)
+# One input for both: with voice on, the chat box has a mic button, and a submission
+# carries text, a recording, or both. "disable" greys the box out while a turn runs.
+submitted = st.chat_input(
+    "Type, or tap the mic and speak in any Indian language" if VOICE_ENABLED else "Ask about a table",
+    accept_audio=VOICE_ENABLED,
+    submit_mode="disable",
+)
+if isinstance(submitted, str) or submitted is None:
+    typed, recording = submitted, None
+else:
+    typed, recording = submitted.text or None, submitted.audio
+typed = typed or st.session_state.pop("queued", None)
 
 guest_text, language = typed, ENGLISH
 if not typed and recording:
-    st.session_state.mic += 1
     try:
         heard = asyncio.run(Voice().listen(recording.getvalue()))
     except SarvamError as e:
