@@ -31,7 +31,9 @@ mcp = MCPServer("goodfoods-reservations")
 Date = Annotated[str, Field(description="YYYY-MM-DD")]
 Time = Annotated[str, Field(description="24-hour HH:MM on the hour or half hour, e.g. 19:30")]
 # No example id here: a model copies a concrete example ("R012") instead of looking one up.
-RestaurantId = Annotated[str, Field(description="Outlet id from recommend_restaurants, or the outlet's name")]
+RestaurantId = Annotated[
+    str, Field(description="Outlet id from recommend_restaurants, or the outlet's name with area: '<brand>, <area>'")
+]
 ReservationId = Annotated[str, Field(description="Booking id, e.g. GF7K2QXM")]
 # Set by the agent loop, never by the model: the loop strips it from the schemas it sends.
 DryRun = Annotated[bool, Field(description="Check everything, write nothing")]

@@ -310,6 +310,10 @@ async def main(argv: list[str] | None = None, model: ChatModel | None = None, ou
                 )
                 return None
             print(f"{'pass' if result['success'] else 'FAIL'}  {case['id']}", flush=True)
+            if not result["success"]:
+                for t in result["turns"]:
+                    print(f"  agent: {t['reply']}\n  wrong args: {t['arg_errors'] or 'none'}")
+                print(f"  final checks failed: {result['final_failures'] or 'none'}", flush=True)
             results.append(result)
             if full_run:
                 saved = {
