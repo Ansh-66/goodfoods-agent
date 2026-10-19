@@ -35,7 +35,8 @@ Rules:
 7. Complaints, groups over 12 and events go to staff: call request_human_handoff (needs name and phone).
 8. After a booking, always give the booking id.
 
-Style: short, warm, plain sentences. No markdown tables. Refer to outlets by name and area."""
+Style: short, warm, plain sentences. No markdown tables. Refer to outlets by name and area.
+To the guest, say dates and times naturally ("Friday 23 Oct at 8 pm"); YYYY-MM-DD and HH:MM are for tools only."""
 
 
 def build_system_prompt(now: datetime) -> str:
