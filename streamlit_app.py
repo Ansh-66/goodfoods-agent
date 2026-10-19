@@ -5,6 +5,9 @@ must survive between messages lives in st.session_state. Each guest message
 opens a fresh MCP session (the server runs as a subprocess), which costs about
 a second and keeps no connection state to manage across reruns.
 
+Guests can type in English or, when SARVAM_API_KEY is set, speak in any Indian
+language: goodfoods.voice translates speech in and replies out, around the agent.
+
 Run:  streamlit run streamlit_app.py
 """
 
@@ -17,9 +20,11 @@ import time
 import streamlit as st
 from dotenv import load_dotenv
 from groq import APIError, AuthenticationError
+from sarvamai.core.api_error import ApiError as SarvamError
 
 from goodfoods.agent import Conversation, GroqModel, TurnResult, mcp_session, run_turn
 from goodfoods.agent.llm import DEFAULT_MODEL
+from goodfoods.voice import ENGLISH, Voice, language_name
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -31,13 +36,15 @@ EXAMPLES = [
     "We're 20 people for an office party next Saturday",
     "What time does the Wok Street outlet in Whitefield close?",
 ]
+VOICE_ENABLED = bool(os.environ.get("SARVAM_API_KEY"))
 
 st.set_page_config(page_title="GoodFoods Reservations", page_icon="🍽️", layout="centered")
 
 
 def reset() -> None:
     st.session_state.conversation = Conversation()
-    st.session_state.transcript = []  # (role, text, TurnResult | None, seconds)
+    st.session_state.transcript = []  # dicts: role, text, and optional note, english, audio, turn, seconds
+    st.session_state.mic = 0  # bumping the recorder's key clears it after each voice message
 
 
 if "conversation" not in st.session_state:
@@ -60,18 +67,37 @@ async def take_turn(text: str) -> TurnResult:
         return await run_turn(st.session_state.conversation, text, GroqModel(), session)
 
 
-def show_steps(turn: TurnResult, seconds: float) -> None:
-    tokens = turn.input_tokens + turn.output_tokens
-    st.caption(f"{turn.model_calls} model call(s) · {tokens:,} tokens · {seconds:.1f} s")
-    if not turn.steps:
+def render(entry: dict, autoplay: bool = False) -> None:
+    if entry.get("note"):
+        st.caption(entry["note"])
+    st.markdown(entry["text"])
+    if entry.get("english"):
+        st.caption(f"English: {entry['english']}")
+    if entry.get("audio"):
+        st.audio(entry["audio"], format="audio/wav", autoplay=autoplay)
+    turn = entry.get("turn")
+    if not turn:
         return
-    with st.expander(f"Tools used ({len(turn.steps)})"):
-        for step in turn.steps:
-            label = "held until the guest confirms" if step.held_for_confirmation else step.result.get("error", "ok")
-            st.markdown(f"**{step.name}** · {label}")
-            st.code(json.dumps(step.arguments, indent=2), language="json")
-            if not step.held_for_confirmation:
-                st.json(step.result, expanded=False)
+    st.caption(
+        f"{turn.model_calls} model call(s) · {turn.input_tokens + turn.output_tokens:,} tokens · "
+        f"{entry['seconds']:.1f} s"
+    )
+    if turn.steps:
+        with st.expander(f"Tools used ({len(turn.steps)})"):
+            for step in turn.steps:
+                label = (
+                    "held until the guest confirms" if step.held_for_confirmation else step.result.get("error", "ok")
+                )
+                st.markdown(f"**{step.name}** · {label}")
+                st.code(json.dumps(step.arguments, indent=2), language="json")
+                if not step.held_for_confirmation:
+                    st.json(step.result, expanded=False)
+
+
+def show(entry: dict) -> None:
+    st.session_state.transcript.append(entry)
+    with st.chat_message(entry["role"]):
+        render(entry, autoplay=True)
 
 
 with st.sidebar:
@@ -84,6 +110,7 @@ with st.sidebar:
     st.divider()
     st.button("New conversation", on_click=reset, use_container_width=True)
     st.caption(f"Model: {os.environ.get('GOODFOODS_MODEL', DEFAULT_MODEL)} on Groq")
+    st.caption("Voice: Sarvam AI" if VOICE_ENABLED else "Voice off: set SARVAM_API_KEY to enable")
 
 st.title("Reserve a table")
 
@@ -91,22 +118,36 @@ if not os.environ.get("GROQ_API_KEY"):
     st.error("GROQ_API_KEY is not set. Add it to .env (see .env.example) and restart.")
     st.stop()
 
-for role, text, turn, seconds in st.session_state.transcript:
-    with st.chat_message(role):
-        st.markdown(text)
-        if turn:
-            show_steps(turn, seconds)
+for entry in st.session_state.transcript:
+    with st.chat_message(entry["role"]):
+        render(entry)
 
 if not st.session_state.transcript:
     with st.chat_message("assistant"):
         st.markdown("Hi! Tell me what you're planning: area, cuisine, date, time and how many people.")
 
-guest_text = st.chat_input("Ask about a table") or st.session_state.pop("queued", None)
+recording = None
+if VOICE_ENABLED:
+    recording = st.audio_input("Or speak, in English or any Indian language", key=f"mic{st.session_state.mic}")
+typed = st.chat_input("Ask about a table") or st.session_state.pop("queued", None)
+
+guest_text, language = typed, ENGLISH
+if not typed and recording:
+    st.session_state.mic += 1
+    try:
+        heard = asyncio.run(Voice().listen(recording.getvalue()))
+    except SarvamError as e:
+        log.error("speech-to-text failed: %s", e)
+        st.error("Couldn't process the recording (Sarvam speech service). Please try again or type instead.")
+        st.stop()
+    if not heard.english:
+        st.warning("I didn't catch that. Please try again.")
+        st.stop()
+    guest_text, language = heard.english, heard.language
+
 if guest_text:
-    with st.chat_message("user"):
-        st.markdown(guest_text)
-    st.session_state.transcript.append(("user", guest_text, None, 0.0))
-    with st.chat_message("assistant"), st.spinner("Checking tables..."):
+    show({"role": "user", "text": guest_text, "note": None if typed else f"Spoken in {language_name(language)}"})
+    with st.spinner("Checking tables..."):
         started = time.perf_counter()
         try:
             turn = asyncio.run(take_turn(guest_text))
@@ -121,6 +162,15 @@ if guest_text:
                 st.error("The language model is not responding (possibly the free-tier rate limit). Try again shortly.")
             st.stop()
         seconds = time.perf_counter() - started
-        st.markdown(turn.reply)
-        show_steps(turn, seconds)
-    st.session_state.transcript.append(("assistant", turn.reply, turn, seconds))
+
+    reply = {"role": "assistant", "text": turn.reply, "turn": turn, "seconds": seconds}
+    if not typed:  # answer a spoken message in the guest's language, out loud
+        try:
+            spoken = asyncio.run(Voice().reply(turn.reply, language))
+            reply.update(audio=spoken.audio)
+            if language != ENGLISH:
+                reply.update(text=spoken.text, english=turn.reply)
+        except SarvamError as e:
+            log.error("translation or speech failed: %s", e)
+            reply.update(note="Voice reply unavailable; showing the English answer.")
+    show(reply)

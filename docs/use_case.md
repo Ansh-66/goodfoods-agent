@@ -89,17 +89,18 @@ stateDiagram-v2
 | Overflow routing to another time or a nearby outlet | Green | The chain-level differentiator |
 | Graceful errors: past dates, closed hours, impossible party sizes, malformed tool calls | Green | Errors return to the model as readable results so it can correct itself |
 | Human hand-off with a summary | Green | Ticket stored with summary and callback number |
+| Voice in the web app: speak a request, hear the reply | Green | Sarvam Saaras (speech-to-text) and Bulbul (text-to-speech) |
+| Indian languages: speak in Hindi, Kannada, Tamil and more, get replies in that language | Green | Translation at the edges (Saaras, Mayura); the agent itself stays English; replies spoken in 11 languages |
 | Hand-off into GoodFoods' ticketing or CRM | Yellow | Integration with their system |
 | Confirmations and reminders to cut no-shows | Yellow | SMS or WhatsApp integration |
 | Guest profiles (dietary needs, past visits, occasions) | Yellow | Consent and CRM integration |
 | Deposits for large groups and peak slots | Red | Payment gateway |
-| WhatsApp and voice channels | Red | Channel integration and a speech pipeline |
-| Indian-language support (Hindi, Kannada, Tamil, ...) | Red | Multilingual speech and text models, a core fit with Sarvam's stack |
+| WhatsApp and phone channels | Red | Channel integration and streaming speech for live calls |
 
 - **Knowledge bases:** the outlet directory (area, address, cuisine, capacity, hours, price band, cost for two, rating, features such as parking, kid-friendly, vegetarian-friendly, wheelchair access) and booking policies (online bookings up to 12 guests, tables held 90 minutes, bookings open 60 days ahead, online changes close 2 hours before).
 - **Tools:** `recommend_restaurants`, `get_restaurant_details`, `check_availability`, `make_reservation`, `get_reservation`, `modify_reservation`, `cancel_reservation`, `request_human_handoff`, served by an MCP server.
-- **Languages:** English in this build; Indian languages are on the roadmap (Red).
-- **Additions beyond the brief:** overflow routing, a code-enforced confirmation gate, staff hand-off tickets and an evaluation harness.
+- **Languages:** English typed; spoken input in English and Indian languages, with replies translated and spoken back in 11 of them (Green).
+- **Additions beyond the brief:** overflow routing, a code-enforced confirmation gate, staff hand-off tickets, voice and Indian languages, and an evaluation harness.
 - **Integrations for production:** GoodFoods' table-management or POS system (replacing the demo database), SMS or WhatsApp, CRM, a payment gateway and staff ticketing.
 
 ## Scale up / Rollout Strategy
@@ -108,14 +109,14 @@ stateDiagram-v2
 2. **Shadow pilot (2 weeks, 3-5 outlets):** the agent drafts bookings and staff approve each one. Measures accuracy on real requests with no risk to guests.
 3. **Live pilot (4 weeks, same outlets):** the agent books directly on the website; the phone stays available. Compare completion, no-show and overflow-recovery rates with non-pilot outlets.
 4. **Chain rollout:** all outlets on the web, then WhatsApp. Failed conversations are reviewed weekly and added to the test set.
-5. **Expansion:** voice and Indian languages, then the same agent for other clients.
+5. **Expansion:** phone and WhatsApp on the existing voice layer, then the same agent for other clients.
 
 **Vertical expansion.** The core is matching a request to limited capacity at a specific time across multiple locations. The same tools-and-agent design transfers, with a new catalogue and capacity model, to other restaurant chains and cloud-kitchen brands, salons and spas (stylist slots), clinics and diagnostic labs (doctor and test slots), sports courts and gyms, coworking meeting rooms, and hotel dining and events. Each needs only its own capacity rules and catalogue, which makes this a repeatable product rather than a one-off build.
 
 **Competitive advantages.**
 1. **Chain-level overflow routing.** Single-restaurant booking tools cannot send a guest to a sister outlet; this turns "sorry, we're full" into a saved booking.
 2. **Measured reliability.** Tool selection and argument accuracy are numbers tracked per release, not a demo impression, and writes are gated in code, so a model mistake cannot create a booking the guest did not approve.
-3. **Built for India's guests.** Designed to extend to WhatsApp, voice and Indian languages, where most guest conversations in India happen.
+3. **Built for India's guests.** Guests already speak to it in their own language; WhatsApp and phone are the next channels, which is where most guest conversations in India happen.
 
 ## Key Challenges
 

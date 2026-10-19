@@ -7,6 +7,7 @@ A conversational agent that books tables across the 75 outlets of GoodFoods, a B
 - **Model:** gpt-oss-20b (`openai/gpt-oss-20b`) on Groq, temperature 0, low reasoning effort. The brief suggests an 8B Llama; Groq retired Llama 3.1 8B on 16 Aug 2026 and names gpt-oss-20b as its replacement (21B parameters, about 3.6B active per token). Any Groq model is one setting away (`GOODFOODS_MODEL`).
 - **Protocol:** Model Context Protocol; the tools run in an MCP server, the agent is an MCP client
 - **Agent:** written from scratch, with no agent framework
+- **Voice and Indian languages:** guests can speak in English or an Indian language and hear the reply in it, through Sarvam AI's speech and translation APIs (optional; needs `SARVAM_API_KEY`)
 - **Evaluation:** 13 scripted guest journeys measuring tool selection, argument accuracy and outcomes
 
 ## Demo
@@ -33,7 +34,7 @@ You need a free Groq API key from [console.groq.com](https://console.groq.com/ke
 
 ```bash
 docker build -t goodfoods-agent .
-docker run --rm -p 8501:8501 -e GROQ_API_KEY=your_key goodfoods-agent
+docker run --rm -p 8501:8501 -e GROQ_API_KEY=your_key -e SARVAM_API_KEY=your_key goodfoods-agent   # Sarvam key optional
 ```
 
 Open http://localhost:8501. The container seeds the demo database on start.
@@ -52,7 +53,7 @@ streamlit run streamlit_app.py
 **Checks**
 
 ```bash
-pytest                             # 38 tests, no API key needed (the model is scripted)
+pytest                             # 41 tests, no API key needed (the model is scripted)
 ruff check . && ruff format --check .
 python evals/run_eval.py           # live evaluation against Groq; uses a large share of the free daily quota
 ```
@@ -69,6 +70,7 @@ python evals/run_eval.py           # live evaluation against Groq; uses a large 
 ```mermaid
 flowchart LR
     G([Guest]) --> UI[Streamlit chat<br/>streamlit_app.py]
+    UI <-->|speech in, speech out| V[Sarvam AI<br/>goodfoods/voice.py]
     UI --> A[Agent loop<br/>goodfoods/agent]
     A <-->|chat + tool schemas| L[gpt-oss-20b<br/>Groq]
     A <-->|MCP over stdio| S[MCP server<br/>goodfoods/server.py]
@@ -78,7 +80,8 @@ flowchart LR
 
 | Layer | Responsibility |
 |---|---|
-| `streamlit_app.py` | Chat UI. Shows each reply with the tools it used, their arguments and results, and the model calls, tokens and time per turn. |
+| `streamlit_app.py` | Chat UI with a voice recorder. Shows each reply with the tools it used, their arguments and results, and the model calls, tokens and time per turn. |
+| `goodfoods/voice.py` | Speech and language layer around the agent (Sarvam Saaras, Mayura, Bulbul). |
 | `goodfoods/agent/` | The loop, the system prompt and the model wrapper. Owns conversation state and the confirmation gate. |
 | `goodfoods/server.py` | Eight MCP tools. Thin wrappers that turn rule violations into readable results. |
 | `goodfoods/availability.py`, `catalog.py`, `reservations.py`, `handoff.py` | Every business rule: capacity, opening hours, overflow routing, ranking, writes. No LLM and no MCP code, so all of it is unit-tested directly. |
@@ -115,7 +118,17 @@ The model decides intent; there are no keyword rules on the guest's text. Code e
 - **Errors are results.** Rule violations (past date, closed, full, party too large) come back as `{"ok": false, "error": ..., "message": ...}` with valid options where useful (areas served, cuisines served, alternative times). Unknown tools, unparseable arguments and schema errors also go back to the model, which corrects itself or asks the guest.
 - **Malformed calls.** When Groq cannot parse the model's tool call (`tool_use_failed`), the loop retries once with a nudge, then falls back to asking the guest to rephrase.
 - **Token budget.** Groq's free tier allows 8,000 tokens per minute and 200,000 per day on this model. Tool schemas (about 1,200 tokens) are stripped of redundant keys, tool results are compacted and capped at 2,000 characters, and only the last 6 guest turns are sent. The Groq SDK retries rate-limited calls, honouring `retry-after`.
-- **Least privilege.** The MCP server runs as a subprocess with only `GOODFOODS_*` settings in its environment; it never sees the API key.
+- **Least privilege.** The MCP server runs as a subprocess with only `GOODFOODS_*` settings in its environment; it never sees the API keys.
+
+### Voice and Indian languages
+
+Language lives at the edges, not in the agent (`goodfoods/voice.py`):
+
+1. The guest records a message in English or an Indian language. Sarvam **Saaras** (speech-to-text in translate mode) returns English text and the detected language.
+2. The English text goes through the same agent loop, prompt, tools and confirmation gate as typed input.
+3. The English reply is translated into the guest's language with **Mayura** (colloquial register, digits kept as digits so times and booking ids survive) and spoken with **Bulbul**.
+
+So the agent, its prompt and its evaluation stay English-only, and supporting another language changes nothing behind this module. Replies are spoken in 11 languages (English, Hindi, Bengali, Gujarati, Kannada, Malayalam, Marathi, Odia, Punjabi, Tamil, Telugu); for other languages Saaras recognises, the reply is translated but shown as text. Every translated reply also shows the English original.
 
 ## Prompt engineering
 
@@ -152,7 +165,8 @@ The full use-case document is in [docs/use_case.md](docs/use_case.md): goals, su
 - **Metrics.** Booking completion rate, overflow recovery rate, no-show rate, staff phone time saved, tool-call accuracy and hand-off rate, with pilot targets in the use-case document.
 - **Rollout.** Offline evaluation, a 2-week shadow pilot at 3-5 outlets with staff approving each booking, a 4-week live pilot, chain rollout on the web, then WhatsApp.
 - **Vertical expansion.** The core is matching a request to limited capacity at a time across locations: other restaurant chains and cloud kitchens, salons and spas, clinics and diagnostic labs, sports courts, coworking rooms, hotel dining.
-- **Roadmap.** Reminders and guest profiles (Yellow); deposits, WhatsApp and voice, and Indian languages (Red).
+- **Built for India.** Guests can already speak to the agent in Indian languages in the web app, using Sarvam's speech and translation models.
+- **Roadmap.** Reminders and guest profiles (Yellow); deposits, and WhatsApp and phone channels (Red).
 
 ## Assumptions, limitations and future work
 
@@ -167,6 +181,7 @@ The full use-case document is in [docs/use_case.md](docs/use_case.md): goals, su
 - "Nearby" is straight-line distance, not travel time.
 - The confirmation gate guarantees a read-back and a guest reply before any write; whether the reply means yes is still the model's judgement.
 - Hand-off tickets are stored locally; there is no staff-facing queue yet.
+- Voice is turn-based (record, then reply), not a live phone call; translated replies can render names or ids differently, so the English original is shown under each.
 - On Groq's free tier, quick consecutive turns can pause for a few seconds while the rate limit resets, and the daily token quota allows roughly one full evaluation run plus demo use.
 - The evaluation is 13 journeys: enough to catch regressions, not a statistical claim.
 
@@ -174,7 +189,7 @@ The full use-case document is in [docs/use_case.md](docs/use_case.md): goals, su
 - Phone verification for changes; SMS or WhatsApp confirmations and reminders.
 - Integration with GoodFoods' table-management system in place of SQLite.
 - Table-level seating (combining tables for groups), and travel-time distance.
-- WhatsApp and voice channels and Indian languages.
+- WhatsApp and phone channels, reusing the voice layer (streaming speech for live calls).
 - Growing the evaluation set from failed production conversations.
 
 ## Project layout
@@ -187,12 +202,13 @@ goodfoods/
   catalog.py        recommendations and outlet details
   reservations.py   book, look up, modify, cancel
   handoff.py        staff tickets
+  voice.py          speech in and out, Indian languages (Sarvam AI)
   db.py, setup_db.py, generate_data.py, config.py, errors.py
 streamlit_app.py    chat UI
 evals/              cases.json, run_eval.py, results
-tests/              38 tests: rules, MCP server, agent loop, UI, eval harness
+tests/              41 tests: rules, MCP server, agent loop, voice layer, UI, eval harness
 docs/use_case.md    business use-case document
 data/restaurants.json
 ```
 
-Configuration (environment or `.env`): `GROQ_API_KEY` (required), `GOODFOODS_MODEL` (default `openai/gpt-oss-20b`), `GOODFOODS_NOW` (pin the clock, ISO datetime), `GOODFOODS_DB` (database path).
+Configuration (environment or `.env`): `GROQ_API_KEY` (required), `SARVAM_API_KEY` (optional, enables voice), `GOODFOODS_MODEL` (default `openai/gpt-oss-20b`), `GOODFOODS_NOW` (pin the clock, ISO datetime), `GOODFOODS_DB` (database path).

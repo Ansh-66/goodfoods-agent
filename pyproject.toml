@@ -7,6 +7,7 @@ requires-python = ">=3.10"
 dependencies = [
     "mcp==2.3.0",
     "groq==1.7.0",
+    "sarvamai==0.1.37",
     "streamlit==1.66.0",
     "pydantic>=2.7",
     "python-dotenv>=1.0",
