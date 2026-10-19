@@ -52,7 +52,7 @@ streamlit run streamlit_app.py
 **Checks**
 
 ```bash
-pytest                             # 37 tests, no API key needed (the model is scripted)
+pytest                             # 38 tests, no API key needed (the model is scripted)
 ruff check . && ruff format --check .
 python evals/run_eval.py           # live evaluation against Groq, about 20 minutes on the free tier
 ```
@@ -190,7 +190,7 @@ goodfoods/
   db.py, setup_db.py, generate_data.py, config.py, errors.py
 streamlit_app.py    chat UI
 evals/              cases.json, run_eval.py, results
-tests/              37 tests: rules, MCP server, agent loop, UI, eval harness
+tests/              38 tests: rules, MCP server, agent loop, UI, eval harness
 docs/use_case.md    business use-case document
 data/restaurants.json
 ```
