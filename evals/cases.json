@@ -1,0 +1,184 @@
+{
+  "now": "2026-10-19T18:00",
+  "notes": "Now is Monday 19 Oct 2026, 18:00, so 'tomorrow' is 2026-10-20 and 'this Friday' is 2026-10-23. Per turn, 'required' tools must be called and anything outside 'required' + 'allowed' counts as a wrong selection. 'args' lists the arguments checked on the first call to that tool.",
+  "cases": [
+    {
+      "id": "book-end-to-end",
+      "journey": "Simple booking",
+      "turns": [
+        {
+          "guest": "Dinner for 4 this Friday at 8 pm, somewhere Italian near Koramangala",
+          "required": ["recommend_restaurants"],
+          "allowed": ["check_availability"],
+          "args": {"recommend_restaurants": {"cuisine": "italian", "area": "koramangala", "party_size": 4, "date": "2026-10-23", "time": "20:00"}}
+        },
+        {
+          "guest": "The first one sounds good. Book it under Ansh, 9876543210",
+          "required": ["make_reservation"],
+          "allowed": ["check_availability", "get_restaurant_details"],
+          "args": {"make_reservation": {"party_size": 4, "date": "2026-10-23", "time": "20:00", "guest_name": "ansh"}}
+        },
+        {
+          "guest": "Yes, please confirm",
+          "required": ["make_reservation"],
+          "allowed": ["check_availability"]
+        }
+      ],
+      "final": {"reservations_by": {"guest_name": "Ansh", "count": 1}, "reply_contains_any": ["GF"]}
+    },
+    {
+      "id": "relative-date",
+      "journey": "Relative date",
+      "turns": [
+        {
+          "guest": "Any South Indian place near HSR Layout for 2 tomorrow at 1 pm?",
+          "required": ["recommend_restaurants"],
+          "allowed": ["check_availability"],
+          "args": {"recommend_restaurants": {"cuisine": "south indian", "area": "hsr", "party_size": 2, "date": "2026-10-20", "time": "13:00"}}
+        }
+      ],
+      "final": {"no_writes": true, "reply_contains_any": ["Dakshin"]}
+    },
+    {
+      "id": "vague-request",
+      "journey": "Vague request",
+      "turns": [
+        {"guest": "I want to eat out this weekend", "required": [], "allowed": ["recommend_restaurants"]}
+      ],
+      "final": {"no_writes": true, "reply_contains_any": ["?"]}
+    },
+    {
+      "id": "full-nearby-outlet",
+      "journey": "Full outlet: nearby outlet offered",
+      "turns": [
+        {
+          "guest": "Is GoodFoods Green Bowl in Koramangala free this Friday at 8 pm for 4?",
+          "required": ["check_availability"],
+          "allowed": ["recommend_restaurants", "get_restaurant_details"],
+          "args": {"check_availability": {"restaurant_id": "R001", "date": "2026-10-23", "time": "20:00", "party_size": 4}}
+        }
+      ],
+      "final": {"no_writes": true, "reply_contains_any": ["BTM", "Ulsoor", "Bannerghatta"]}
+    },
+    {
+      "id": "full-other-time",
+      "journey": "Full outlet: other time offered",
+      "turns": [
+        {
+          "guest": "Can I get a table for 2 at Wok Street in Whitefield this Friday at 8 pm?",
+          "required": ["check_availability"],
+          "allowed": ["recommend_restaurants", "get_restaurant_details"],
+          "args": {"check_availability": {"restaurant_id": "R004", "date": "2026-10-23", "time": "20:00", "party_size": 2}}
+        }
+      ],
+      "final": {"no_writes": true, "reply_contains_any": ["18:30", "21:30", "6:30", "9:30"]}
+    },
+    {
+      "id": "modify",
+      "journey": "Modify booking",
+      "setup": {"restaurant_id": "R010", "date": "2026-10-23", "time": "13:00", "party_size": 2, "guest_name": "Meera"},
+      "turns": [
+        {
+          "guest": "Please change my booking {reservation_id} to 3 people",
+          "required": ["modify_reservation"],
+          "allowed": ["get_reservation", "check_availability"],
+          "args": {"modify_reservation": {"reservation_id": "{reservation_id}", "party_size": 3}}
+        },
+        {"guest": "Yes, that's right", "required": ["modify_reservation"], "allowed": ["get_reservation"]}
+      ],
+      "final": {"reservation": {"party_size": 3, "status": "confirmed"}}
+    },
+    {
+      "id": "cancel",
+      "journey": "Cancel booking",
+      "setup": {"restaurant_id": "R010", "date": "2026-10-23", "time": "13:00", "party_size": 2, "guest_name": "Meera"},
+      "turns": [
+        {
+          "guest": "I need to cancel reservation {reservation_id}",
+          "required": ["cancel_reservation"],
+          "allowed": ["get_reservation"],
+          "args": {"cancel_reservation": {"reservation_id": "{reservation_id}"}}
+        },
+        {"guest": "Yes, cancel it", "required": ["cancel_reservation"], "allowed": ["get_reservation"]}
+      ],
+      "final": {"reservation": {"status": "cancelled"}}
+    },
+    {
+      "id": "lookup",
+      "journey": "Look up booking",
+      "setup": {"restaurant_id": "R010", "date": "2026-10-23", "time": "13:00", "party_size": 2, "guest_name": "Meera"},
+      "turns": [
+        {
+          "guest": "Can you tell me the details of booking {reservation_id}?",
+          "required": ["get_reservation"],
+          "allowed": [],
+          "args": {"get_reservation": {"reservation_id": "{reservation_id}"}}
+        }
+      ],
+      "final": {"no_writes": true, "reply_contains_any": ["Mezze"]}
+    },
+    {
+      "id": "outlet-info",
+      "journey": "Outlet information",
+      "turns": [
+        {
+          "guest": "What time does the Wok Street outlet in Whitefield close?",
+          "required": ["get_restaurant_details"],
+          "allowed": ["recommend_restaurants"],
+          "args": {"get_restaurant_details": {"restaurant_id": "R004"}}
+        }
+      ],
+      "final": {"no_writes": true, "reply_contains_any": ["23:00", "11 pm", "11 PM", "11:00 pm", "11:00 PM"]}
+    },
+    {
+      "id": "past-date",
+      "journey": "Impossible request: past date",
+      "turns": [
+        {
+          "guest": "Book a table for 2 yesterday at 8 pm at Wok Street Whitefield, name Ansh",
+          "required": [],
+          "allowed": ["recommend_restaurants", "check_availability", "get_restaurant_details"]
+        }
+      ],
+      "final": {"no_writes": true}
+    },
+    {
+      "id": "large-group-handoff",
+      "journey": "Impossible request: party of 25",
+      "turns": [
+        {
+          "guest": "Table for 25 people tomorrow evening in Indiranagar",
+          "required": [],
+          "allowed": ["recommend_restaurants", "check_availability"]
+        },
+        {
+          "guest": "Yes please, I'm Rohan, 9812345678",
+          "required": ["request_human_handoff"],
+          "allowed": [],
+          "args": {"request_human_handoff": {"reason": "large_group", "guest_name": "rohan", "guest_phone": "9812345678"}}
+        }
+      ],
+      "final": {"handoffs": 1, "reservations_by": {"guest_name": "Rohan", "count": 0}}
+    },
+    {
+      "id": "complaint-handoff",
+      "journey": "Complaint: hand-off to staff",
+      "turns": [
+        {"guest": "The food at your Jayanagar outlet was cold yesterday. I want to complain.", "required": [], "allowed": []},
+        {
+          "guest": "Kabir, 9900112233",
+          "required": ["request_human_handoff"],
+          "allowed": [],
+          "args": {"request_human_handoff": {"reason": "complaint", "guest_name": "kabir", "guest_phone": "9900112233"}}
+        }
+      ],
+      "final": {"handoffs": 1}
+    },
+    {
+      "id": "off-topic",
+      "journey": "Off-topic",
+      "turns": [{"guest": "Write me a poem about cricket", "required": [], "allowed": []}],
+      "final": {"no_writes": true}
+    }
+  ]
+}
