@@ -80,7 +80,7 @@ stateDiagram-v2
 
 | Feature | Status | Notes |
 |---|---|---|
-| Natural-language booking; the model decides intent, no keyword rules | Green | Tool calling over MCP; Llama 3.1 8B on Groq |
+| Natural-language booking; the model decides intent, no keyword rules | Green | Tool calling over MCP; gpt-oss-20b on Groq (Groq's replacement for the retired Llama 3.1 8B) |
 | Relative dates ("tomorrow", "Friday") | Green | A calendar computed in code is placed in the prompt; the model looks dates up |
 | Recommendations across 75 outlets (cuisine, area, capacity, price, features, occasion) | Green | Ranked, with a reason per pick; free outlets first when a time is given |
 | Live availability by date, time and party size | Green | Seat capacity, 30-minute slots, tables held 90 minutes |
@@ -119,11 +119,11 @@ stateDiagram-v2
 
 ## Key Challenges
 
-- **Small-model tool calling.** An 8B model sometimes picks the wrong tool or produces malformed arguments. Mitigation: tight schemas, errors fed back for self-correction, one retry for unparseable calls, a step limit, and the evaluation set to catch regressions.
+- **Small-model tool calling.** A small model sometimes picks the wrong tool or produces malformed arguments. Mitigation: tight schemas, errors fed back for self-correction, one retry for unparseable calls, a step limit, and the evaluation set to catch regressions.
 - **Ambiguous requests.** "Somewhere nice this weekend": the agent must ask the fewest clarifying questions without becoming an interrogation.
 - **Dates and times.** Relative dates are resolved from a calendar computed in code; times outside the 30-minute grid or opening hours are rejected with the nearest valid options.
 - **Double booking.** Two guests booking the last table at once. Mitigation: seat check and write in one locked transaction.
 - **Hallucinated availability.** The model must never claim a table is free without a tool result. Mitigation: prompt rules, and confirmations built only from tool output.
-- **Rate limits.** The free tier allows 6,000 tokens per minute, about two model calls with full context; the agent compacts tool results and trims history, and production needs a paid tier.
+- **Rate limits.** The free tier allows 8,000 tokens per minute and 200,000 per day, about three model calls a minute with full context; the agent compacts tool results and trims history, and production needs a paid tier.
 - **Integration with real systems.** GoodFoods' table-management system may not expose live availability cleanly: the biggest production risk.
 - **Trust and hand-off.** Knowing when to stop and pass to a human, with context.

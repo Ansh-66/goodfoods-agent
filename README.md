@@ -4,7 +4,7 @@
 
 A conversational agent that books tables across the 75 outlets of GoodFoods, a Bengaluru restaurant chain. Guests describe what they want in plain language; the agent recommends outlets, checks live availability, and books, changes or cancels reservations through tools served over MCP. When an outlet is full, it routes the guest to another time or a nearby GoodFoods outlet instead of losing the booking.
 
-- **Model:** Llama 3.1 8B (`llama-3.1-8b-instant`) on Groq, temperature 0
+- **Model:** gpt-oss-20b (`openai/gpt-oss-20b`) on Groq, temperature 0, low reasoning effort. The brief suggests an 8B Llama; Groq retired Llama 3.1 8B on 16 Aug 2026 and names gpt-oss-20b as its replacement (21B parameters, about 3.6B active per token). Any Groq model is one setting away (`GOODFOODS_MODEL`).
 - **Protocol:** Model Context Protocol; the tools run in an MCP server, the agent is an MCP client
 - **Agent:** written from scratch, with no agent framework
 - **Evaluation:** 13 scripted guest journeys measuring tool selection, argument accuracy and outcomes
@@ -54,7 +54,7 @@ streamlit run streamlit_app.py
 ```bash
 pytest                             # 38 tests, no API key needed (the model is scripted)
 ruff check . && ruff format --check .
-python evals/run_eval.py           # live evaluation against Groq, about 20 minutes on the free tier
+python evals/run_eval.py           # live evaluation against Groq; uses a large share of the free daily quota
 ```
 
 **Try these** (the demo data makes some outlets full at dinner):
@@ -70,7 +70,7 @@ python evals/run_eval.py           # live evaluation against Groq, about 20 minu
 flowchart LR
     G([Guest]) --> UI[Streamlit chat<br/>streamlit_app.py]
     UI --> A[Agent loop<br/>goodfoods/agent]
-    A <-->|chat + tool schemas| L[Llama 3.1 8B<br/>Groq]
+    A <-->|chat + tool schemas| L[gpt-oss-20b<br/>Groq]
     A <-->|MCP over stdio| S[MCP server<br/>goodfoods/server.py]
     S --> R[Booking rules<br/>availability, catalog,<br/>reservations, handoff]
     R --> D[(SQLite)]
@@ -114,14 +114,14 @@ The model decides intent; there are no keyword rules on the guest's text. Code e
 - **Confirmation gate.** `make_reservation`, `modify_reservation` and `cancel_reservation` never run on the model's first request. The loop holds the write and returns `confirmation_required` with the details, so the model reads them back to the guest. The write runs only when the model requests the same write again in a later turn, after the guest has replied. A model that tries to confirm its own write in the same turn is held again, and changed details need a fresh confirmation.
 - **Errors are results.** Rule violations (past date, closed, full, party too large) come back as `{"ok": false, "error": ..., "message": ...}` with valid options where useful (areas served, cuisines served, alternative times). Unknown tools, unparseable arguments and schema errors also go back to the model, which corrects itself or asks the guest.
 - **Malformed calls.** When Groq cannot parse the model's tool call (`tool_use_failed`), the loop retries once with a nudge, then falls back to asking the guest to rephrase.
-- **Token budget.** Groq's free tier allows 6,000 tokens per minute on this model. Tool schemas (about 1,200 tokens) are stripped of redundant keys, tool results are compacted and capped at 2,000 characters, and only the last 6 guest turns are sent. The Groq SDK retries rate-limited calls, honouring `retry-after`.
+- **Token budget.** Groq's free tier allows 8,000 tokens per minute and 200,000 per day on this model. Tool schemas (about 1,200 tokens) are stripped of redundant keys, tool results are compacted and capped at 2,000 characters, and only the last 6 guest turns are sent. The Groq SDK retries rate-limited calls, honouring `retry-after`.
 - **Least privilege.** The MCP server runs as a subprocess with only `GOODFOODS_*` settings in its environment; it never sees the API key.
 
 ## Prompt engineering
 
 The system prompt is in `goodfoods/agent/prompt.py` and is rebuilt every turn. The choices, and why:
 
-- **Dates are looked up, not computed.** The prompt carries a 14-day calendar generated in code ("Fri 23 Oct = 2026-10-23"). An 8B model copies a date from a table reliably; it does not reliably work out "next Friday". Ambiguous phrases resolve to the nearest match and the date is stated back, so the guest can correct it.
+- **Dates are looked up, not computed.** The prompt carries a 14-day calendar generated in code ("Fri 23 Oct = 2026-10-23"). A small model copies a date from a table reliably; it does not reliably work out "next Friday". Ambiguous phrases resolve to the nearest match and the date is stated back, so the guest can correct it.
 - **Numbered hard rules.** Eight short rules: never state availability, prices or ids without a tool result; ask for one missing detail at a time; check availability before booking; offer the alternatives a full outlet returns; how to handle `confirmation_required`; explain errors in plain words without codes; hand off complaints and large groups; always give the booking id. Small models follow short numbered rules better than prose.
 - **Tool descriptions carry the domain.** Formats live in the schema (`YYYY-MM-DD`, `HH:MM on the hour or half hour`, `R012`, `GF7K2QXM`), the valid feature names are listed in the parameter description, and guest wording is normalised server-side ("biryani" matches Mughlai and Andhra, "outdoor" matches `outdoor_seating`), so the model can pass what the guest said.
 - **Scope.** One sentence keeps the agent to GoodFoods reservations; off-topic requests get a one-line decline.
@@ -167,7 +167,7 @@ The full use-case document is in [docs/use_case.md](docs/use_case.md): goals, su
 - "Nearby" is straight-line distance, not travel time.
 - The confirmation gate guarantees a read-back and a guest reply before any write; whether the reply means yes is still the model's judgement.
 - Hand-off tickets are stored locally; there is no staff-facing queue yet.
-- On Groq's free tier, quick consecutive turns can pause for a few seconds while the rate limit resets.
+- On Groq's free tier, quick consecutive turns can pause for a few seconds while the rate limit resets, and the daily token quota allows roughly one full evaluation run plus demo use.
 - The evaluation is 13 journeys: enough to catch regressions, not a statistical claim.
 
 **Future work**
@@ -195,4 +195,4 @@ docs/use_case.md    business use-case document
 data/restaurants.json
 ```
 
-Configuration (environment or `.env`): `GROQ_API_KEY` (required), `GOODFOODS_MODEL` (default `llama-3.1-8b-instant`), `GOODFOODS_NOW` (pin the clock, ISO datetime), `GOODFOODS_DB` (database path).
+Configuration (environment or `.env`): `GROQ_API_KEY` (required), `GOODFOODS_MODEL` (default `openai/gpt-oss-20b`), `GOODFOODS_NOW` (pin the clock, ISO datetime), `GOODFOODS_DB` (database path).

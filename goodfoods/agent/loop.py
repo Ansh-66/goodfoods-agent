@@ -18,7 +18,7 @@ enforces what must not depend on the model getting it right:
   the model as tool results so it can correct itself; a call the provider could
   not parse is retried once with a nudge.
 - Budget. Tool results are compacted and capped, and only the last few guest
-  turns are sent, to stay inside the free tier's 6,000 tokens per minute.
+  turns are sent, to stay inside the free tier's 8,000 tokens per minute.
 """
 
 import json

@@ -2,7 +2,7 @@
 
 Relative dates are resolved in code: the prompt carries a 14-day calendar
 computed from the clock, so the model looks a date up instead of calculating it.
-An 8B model reliably copies "Fri 23 Oct = 2026-10-23"; it does not reliably
+A small model reliably copies "Fri 23 Oct = 2026-10-23"; it does not reliably
 work out what "next Friday" is.
 """
 

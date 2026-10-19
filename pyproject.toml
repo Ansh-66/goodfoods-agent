@@ -1,7 +1,7 @@
 [project]
 name = "goodfoods-agent"
 version = "1.0.0"
-description = "Conversational reservation agent for the GoodFoods restaurant chain: an MCP tool server, a from-scratch agent loop on Llama 3.1 8B, and an evaluation harness."
+description = "Conversational reservation agent for the GoodFoods restaurant chain: an MCP tool server, a from-scratch agent loop on gpt-oss-20b, and an evaluation harness."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
