@@ -128,7 +128,7 @@ with st.sidebar:
     st.caption(f"Model: {os.environ.get('GOODFOODS_MODEL', DEFAULT_MODEL)} on Groq")
     st.caption("Voice: Sarvam AI" if VOICE_ENABLED else "Voice off: set SARVAM_API_KEY to enable")
 
-st.title("Reserve a table")
+st.title("GoodFoods - Reserve a table")
 
 if not os.environ.get("GROQ_API_KEY"):
     st.error("GROQ_API_KEY is not set. Add it to .env (see .env.example) and restart.")
