@@ -143,11 +143,12 @@ def check_final(
         row = reservations.get_reservation(conn, reservation_id)
         failures += [f"{k}={row[k]!r}, expected {v!r}" for k, v in spec["reservation"].items() if row[k] != v]
     # reply_contains_any: a list of alternatives, or a list of such lists that must all be met
+    reply = " ".join(reply.split()).lower()  # the model writes "11\u202fpm"; split() treats that as a space
     wanted = spec.get("reply_contains_any", [])
     for group in wanted if wanted and isinstance(wanted[0], list) else [wanted] if wanted else []:
-        if not any(s.lower() in reply.lower() for s in group):
+        if not any(s.lower() in reply for s in group):
             failures.append(f"last reply mentions none of {group}")
-    if found := [s for s in spec.get("reply_excludes", []) if s.lower() in reply.lower()]:
+    if found := [s for s in spec.get("reply_excludes", []) if s.lower() in reply]:
         failures.append(f"last reply contains {found}")
     return failures
 

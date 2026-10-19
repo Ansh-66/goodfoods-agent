@@ -159,6 +159,8 @@ The first full run (commit `b14fa96`) scored 11/16 cases, 17/22 turns for tool s
 | "Is Wok Street free at 8?" answered without the other times | The model answers from one `recommend_restaurants` call; that call ranked free outlets first, so the full outlet the guest named dropped out, and only `check_availability` returned other times | A named outlet keeps its place in the ranking, and a full outlet in a recommendation lists its nearest free times. The shortest path the model takes is now complete, instead of a prompt rule fighting it |
 | `get_restaurant_details("R012")`, then `("WokStreetWhitefield")` | The schema's example id (`R012`) was copied; then the name was passed as an id | No example id in the schema; outlets resolve by name as well as id |
 | On re-run, "Wok Street in Whitefield" searched by area only; "GoodFoods Green Bowl" was ambiguous and the agent asked "which one?" although the guest had said Koramangala | The schema never said which words are outlet names, and the ambiguity error told the model to ask | The `name` parameter lists the 12 GoodFoods brands; the ambiguity error says to use the area the guest gave. That case had passed only because the candidate list happened to name the expected outlets, so its check now also requires the reply to say the outlet is full |
+| Asking the model for names as `'<brand>, <area>'` produced `"GoodFoods, Whitefield"` | A format hint is followed literally, with the chain name taken as the brand | Reverted. Not every failure gets a schema fix: "is Green Bowl Koramangala free?" still sometimes gets an area search that offers a different outlet, and is listed under limitations |
+| `outlet-info` failed on a reply that said "11 pm" | **Harness bug:** the model writes a narrow no-break space (U+202F) between "11" and "pm" | Reply checks normalise whitespace |
 | Booking modification not attempted | PENDING: diagnosis from the run's transcript | PENDING |
 | Party-of-25 case failed on "3,640 bookings for Rohan" | **Harness bug:** Rohan is also a seeded guest name | Count only bookings made during the case |
 | Complaint case failed on an early hand-off attempt | **Harness too strict:** the tool rejected the attempt for missing details, the agent then asked for them and created exactly one correct ticket | Allow the attempt; the outcome checks still require exactly one ticket with the right name and phone |
@@ -200,6 +202,7 @@ The full use-case document is in [docs/use_case.md](docs/use_case.md): goals, su
 - Hand-off tickets are stored locally; there is no staff-facing queue yet.
 - Voice is turn-based (record, then reply), not a live phone call; translated replies can render names or ids differently, so the English original is shown under each.
 - On Groq's free tier, quick consecutive turns can pause for a few seconds while the rate limit resets, and the daily token quota allows roughly one full evaluation run plus demo use.
+- When a guest names both an outlet and an area, the 20B model sometimes searches the area only and offers a different outlet without saying the named one is full.
 - The evaluation is 16 journeys: enough to catch regressions, not a statistical claim.
 
 **Future work**

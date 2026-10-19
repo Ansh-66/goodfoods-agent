@@ -28,7 +28,7 @@ def lookup(args):
 
 
 def test_passing_case_scores_full_marks(conn):
-    model = Scripted(lookup({"restaurant_id": "R004"}), ModelReply("It closes at 23:00."))
+    model = Scripted(lookup({"restaurant_id": "R004"}), ModelReply("It closes at 11\u202fpm."))  # as gpt-oss writes it
     summary = asyncio.run(run_eval.main(["--case", "outlet-info"], model=model))
     assert summary["case_success"] == 1 and summary["args_correct"] == summary["arg_checks"] == 1
 
