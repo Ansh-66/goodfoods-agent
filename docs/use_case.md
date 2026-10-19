@@ -118,6 +118,26 @@ stateDiagram-v2
 2. **Measured reliability.** Tool selection and argument accuracy are numbers tracked per release, not a demo impression, and writes are gated in code, so a model mistake cannot create a booking the guest did not approve.
 3. **Built for India's guests.** Guests already speak to it in their own language; WhatsApp and phone are the next channels, which is where most guest conversations in India happen.
 
+## Opportunities beyond reservations
+
+Every conversation records what a guest wanted, not only what they booked. That makes the agent a source of data GoodFoods does not have today:
+
+- **Unmet demand by area and hour.** Requests that end with no table, even after overflow routing, show where the chain turns guests away. That is evidence for where to add seats or open the next outlet.
+- **Filling quiet slots.** Offering 6:30 instead of 8:00 moves demand into hours that would otherwise be empty, without discounting.
+- **Group and event leads.** A request for 25 people is a high-value sale that today is often a missed call. Hand-off tickets turn it into a lead with a name, phone and summary for the events team.
+- **Service quality signal.** Complaint tickets arrive tagged by outlet, so operations see problems by branch without waiting for review sites.
+- **Guest memory (Yellow).** Repeat guests, usual party size and preferences enable a faster rebooking and targeted offers on WhatsApp.
+
+## Stakeholders
+
+| Who | What they need from this | Role in the rollout |
+|---|---|---|
+| Guests | A table in one conversation, in their language, without calling | Pilot users; their completion and drop-off rates decide go or no-go |
+| Outlet managers and floor staff | Fewer phone calls in rush hours; a clear queue of hand-offs | Approve bookings during the shadow pilot; handle hand-off tickets |
+| Central operations | Chain-wide view of demand, overflow and complaints | Owns the success metrics and the go-live decision |
+| Marketing / CRM | Reachable guests for reminders and offers | Owner of the WhatsApp channel (Yellow/Red phase) |
+| IT / table-management vendor | A stable integration with live availability | Provides the availability API: the main production dependency |
+
 ## Key Challenges
 
 - **Small-model tool calling.** A small model sometimes picks the wrong tool or produces malformed arguments. Mitigation: tight schemas, errors fed back for self-correction, one retry for unparseable calls, a step limit, and the evaluation set to catch regressions.

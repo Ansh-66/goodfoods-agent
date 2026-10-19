@@ -177,12 +177,13 @@ PENDING: transcripts from the live app for booking, full outlet, modify or cance
 
 ## Business strategy
 
-The full use-case document is in [docs/use_case.md](docs/use_case.md): goals, success metrics, the bot flow, a state transition diagram, the feature list by difficulty, rollout and key challenges.
+The full use-case document is in [docs/use_case.md](docs/use_case.md): goals, success metrics, the bot flow, a state transition diagram, the feature list by difficulty, rollout, opportunities beyond reservations, stakeholders and key challenges.
 
 - **Problem.** Guests phone individual branches, and a full branch means a lost booking even when a sister outlet nearby has space. Staff spend hours a day on the phone.
 - **What is different.** Chain-level overflow routing turns "we're full" into a booking at another time or outlet. Reliability is measured (tool and argument accuracy per release) and writes are gated in code.
 - **Metrics.** Booking completion rate, overflow recovery rate, no-show rate, staff phone time saved, tool-call accuracy and hand-off rate, with pilot targets in the use-case document.
 - **Rollout.** Offline evaluation, a 2-week shadow pilot at 3-5 outlets with staff approving each booking, a 4-week live pilot, chain rollout on the web, then WhatsApp.
+- **Beyond reservations.** Every conversation records what guests wanted, not only what they booked: unmet demand by area and hour, quiet slots to fill, group and event leads from hand-offs, complaints by outlet.
 - **Vertical expansion.** The core is matching a request to limited capacity at a time across locations: other restaurant chains and cloud kitchens, salons and spas, clinics and diagnostic labs, sports courts, coworking rooms, hotel dining.
 - **Built for India.** Guests can already speak to the agent in Indian languages in the web app, using Sarvam's speech and translation models.
 - **Roadmap.** Reminders and guest profiles (Yellow); deposits, and WhatsApp and phone channels (Red).
