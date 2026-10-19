@@ -1,0 +1,1888 @@
+[
+  {
+    "id": "R001",
+    "name": "GoodFoods Green Bowl, Koramangala",
+    "concept": "Green Bowl",
+    "area": "Koramangala",
+    "address": "9, 1st Main, Koramangala, Bengaluru",
+    "lat": 12.93182,
+    "lon": 77.62456,
+    "cuisines": [
+      "Vegetarian",
+      "Healthy"
+    ],
+    "price_band": 2,
+    "cost_for_two": 800,
+    "capacity": 70,
+    "opens": "08:00",
+    "closes": "22:30",
+    "rating": 4.5,
+    "phone": "080-48038374",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "kid_friendly",
+      "bar"
+    ]
+  },
+  {
+    "id": "R002",
+    "name": "GoodFoods Andhra Spice, Indiranagar",
+    "concept": "Andhra Spice",
+    "area": "Indiranagar",
+    "address": "196, 6th Main, Indiranagar, Bengaluru",
+    "lat": 12.97351,
+    "lon": 77.63596,
+    "cuisines": [
+      "Andhra",
+      "South Indian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1050,
+    "capacity": 80,
+    "opens": "11:30",
+    "closes": "23:00",
+    "rating": 4.6,
+    "phone": "080-48707870",
+    "features": [
+      "outdoor_seating",
+      "bar",
+      "parking",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R003",
+    "name": "GoodFoods Sakura, HSR Layout",
+    "concept": "Sakura",
+    "area": "HSR Layout",
+    "address": "18, 1st Main, HSR Layout, Bengaluru",
+    "lat": 12.91488,
+    "lon": 77.65322,
+    "cuisines": [
+      "Japanese",
+      "Sushi"
+    ],
+    "price_band": 4,
+    "cost_for_two": 3850,
+    "capacity": 70,
+    "opens": "12:30",
+    "closes": "23:00",
+    "rating": 4.7,
+    "phone": "080-47377459",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "kid_friendly",
+      "bar",
+      "parking",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R004",
+    "name": "GoodFoods Wok Street, Whitefield",
+    "concept": "Wok Street",
+    "area": "Whitefield",
+    "address": "163, 4th Main, Whitefield, Bengaluru",
+    "lat": 12.96576,
+    "lon": 77.74855,
+    "cuisines": [
+      "Chinese",
+      "Pan-Asian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1300,
+    "capacity": 70,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.5,
+    "phone": "080-41938483",
+    "features": [
+      "private_dining",
+      "kid_friendly",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R005",
+    "name": "GoodFoods Andhra Spice, Jayanagar",
+    "concept": "Andhra Spice",
+    "area": "Jayanagar",
+    "address": "128, 8th Cross, Jayanagar, Bengaluru",
+    "lat": 12.92071,
+    "lon": 77.58948,
+    "cuisines": [
+      "Andhra",
+      "South Indian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1200,
+    "capacity": 80,
+    "opens": "11:30",
+    "closes": "23:00",
+    "rating": 4.5,
+    "phone": "080-48187926",
+    "features": [
+      "kid_friendly",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R006",
+    "name": "GoodFoods Chettinad Table, JP Nagar",
+    "concept": "Chettinad Table",
+    "area": "JP Nagar",
+    "address": "203, 8th Main, JP Nagar, Bengaluru",
+    "lat": 12.90492,
+    "lon": 77.58685,
+    "cuisines": [
+      "Chettinad",
+      "South Indian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1150,
+    "capacity": 80,
+    "opens": "11:30",
+    "closes": "23:00",
+    "rating": 4.8,
+    "phone": "080-41192619",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "bar",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R007",
+    "name": "GoodFoods Green Bowl, MG Road",
+    "concept": "Green Bowl",
+    "area": "MG Road",
+    "address": "245, 6th Main, MG Road, Bengaluru",
+    "lat": 12.97569,
+    "lon": 77.60028,
+    "cuisines": [
+      "Vegetarian",
+      "Healthy"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1300,
+    "capacity": 80,
+    "opens": "08:00",
+    "closes": "22:30",
+    "rating": 4.6,
+    "phone": "080-49517169",
+    "features": [
+      "veg_friendly",
+      "kid_friendly",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R008",
+    "name": "GoodFoods Chettinad Table, Malleshwaram",
+    "concept": "Chettinad Table",
+    "area": "Malleshwaram",
+    "address": "29, 6th Cross, Malleshwaram, Bengaluru",
+    "lat": 12.99997,
+    "lon": 77.56119,
+    "cuisines": [
+      "Chettinad",
+      "South Indian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1250,
+    "capacity": 50,
+    "opens": "11:30",
+    "closes": "23:00",
+    "rating": 3.9,
+    "phone": "080-49153566",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "private_dining"
+    ]
+  },
+  {
+    "id": "R009",
+    "name": "GoodFoods Dakshin, Basavanagudi",
+    "concept": "Dakshin",
+    "area": "Basavanagudi",
+    "address": "247, 4th Main, Basavanagudi, Bengaluru",
+    "lat": 12.94316,
+    "lon": 77.57259,
+    "cuisines": [
+      "South Indian"
+    ],
+    "price_band": 1,
+    "cost_for_two": 650,
+    "capacity": 100,
+    "opens": "07:30",
+    "closes": "22:30",
+    "rating": 4.2,
+    "phone": "080-49683481",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R010",
+    "name": "GoodFoods Mezze, BTM Layout",
+    "concept": "Mezze",
+    "area": "BTM Layout",
+    "address": "59, 1st Main, BTM Layout, Bengaluru",
+    "lat": 12.92092,
+    "lon": 77.60495,
+    "cuisines": [
+      "Mediterranean",
+      "Middle Eastern"
+    ],
+    "price_band": 3,
+    "cost_for_two": 1750,
+    "capacity": 80,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.5,
+    "phone": "080-44594297",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "private_dining",
+      "bar",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R011",
+    "name": "GoodFoods Sakura, Electronic City",
+    "concept": "Sakura",
+    "area": "Electronic City",
+    "address": "111, 6th Cross, Electronic City, Bengaluru",
+    "lat": 12.84413,
+    "lon": 77.66457,
+    "cuisines": [
+      "Japanese",
+      "Sushi"
+    ],
+    "price_band": 4,
+    "cost_for_two": 2550,
+    "capacity": 50,
+    "opens": "12:30",
+    "closes": "23:00",
+    "rating": 3.9,
+    "phone": "080-46692553",
+    "features": [
+      "veg_friendly",
+      "bar",
+      "parking",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R012",
+    "name": "GoodFoods Dakshin, Marathahalli",
+    "concept": "Dakshin",
+    "area": "Marathahalli",
+    "address": "221, 12th Main, Marathahalli, Bengaluru",
+    "lat": 12.95371,
+    "lon": 77.70339,
+    "cuisines": [
+      "South Indian"
+    ],
+    "price_band": 1,
+    "cost_for_two": 700,
+    "capacity": 40,
+    "opens": "07:30",
+    "closes": "22:30",
+    "rating": 4.8,
+    "phone": "080-44965789",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "bar",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R013",
+    "name": "GoodFoods Coast & Curry, Bellandur",
+    "concept": "Coast & Curry",
+    "area": "Bellandur",
+    "address": "201, 8th Cross, Bellandur, Bengaluru",
+    "lat": 12.92948,
+    "lon": 77.68389,
+    "cuisines": [
+      "Coastal",
+      "Seafood"
+    ],
+    "price_band": 3,
+    "cost_for_two": 2150,
+    "capacity": 60,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.0,
+    "phone": "080-44652414",
+    "features": [
+      "bar",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R014",
+    "name": "GoodFoods Tandoor House, Hebbal",
+    "concept": "Tandoor House",
+    "area": "Hebbal",
+    "address": "246, 12th Main, Hebbal, Bengaluru",
+    "lat": 13.04002,
+    "lon": 77.59182,
+    "cuisines": [
+      "North Indian",
+      "Mughlai"
+    ],
+    "price_band": 2,
+    "cost_for_two": 850,
+    "capacity": 70,
+    "opens": "12:00",
+    "closes": "23:30",
+    "rating": 4.2,
+    "phone": "080-45130808",
+    "features": [
+      "kid_friendly",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R015",
+    "name": "GoodFoods Chettinad Table, Yelahanka",
+    "concept": "Chettinad Table",
+    "area": "Yelahanka",
+    "address": "62, 6th Cross, Yelahanka, Bengaluru",
+    "lat": 13.09627,
+    "lon": 77.59805,
+    "cuisines": [
+      "Chettinad",
+      "South Indian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1150,
+    "capacity": 100,
+    "opens": "11:30",
+    "closes": "23:00",
+    "rating": 4.7,
+    "phone": "080-42217071",
+    "features": [
+      "parking"
+    ]
+  },
+  {
+    "id": "R016",
+    "name": "GoodFoods Tandoor House, Rajajinagar",
+    "concept": "Tandoor House",
+    "area": "Rajajinagar",
+    "address": "226, 4th Cross, Rajajinagar, Bengaluru",
+    "lat": 12.98852,
+    "lon": 77.55426,
+    "cuisines": [
+      "North Indian",
+      "Mughlai"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1200,
+    "capacity": 80,
+    "opens": "12:00",
+    "closes": "23:30",
+    "rating": 4.4,
+    "phone": "080-49874152",
+    "features": [
+      "kid_friendly",
+      "bar",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R017",
+    "name": "GoodFoods Tandoor House, Banashankari",
+    "concept": "Tandoor House",
+    "area": "Banashankari",
+    "address": "40, 6th Cross, Banashankari, Bengaluru",
+    "lat": 12.92676,
+    "lon": 77.54941,
+    "cuisines": [
+      "North Indian",
+      "Mughlai"
+    ],
+    "price_band": 2,
+    "cost_for_two": 950,
+    "capacity": 80,
+    "opens": "12:00",
+    "closes": "23:30",
+    "rating": 4.3,
+    "phone": "080-45213115",
+    "features": [
+      "kid_friendly",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R018",
+    "name": "GoodFoods Tandoor House, Frazer Town",
+    "concept": "Tandoor House",
+    "area": "Frazer Town",
+    "address": "142, 8th Main, Frazer Town, Bengaluru",
+    "lat": 12.99204,
+    "lon": 77.61864,
+    "cuisines": [
+      "North Indian",
+      "Mughlai"
+    ],
+    "price_band": 2,
+    "cost_for_two": 900,
+    "capacity": 40,
+    "opens": "12:00",
+    "closes": "23:30",
+    "rating": 4.6,
+    "phone": "080-43484601",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "kid_friendly",
+      "parking"
+    ]
+  },
+  {
+    "id": "R019",
+    "name": "GoodFoods The Grill Room, Sadashivanagar",
+    "concept": "The Grill Room",
+    "area": "Sadashivanagar",
+    "address": "27, 6th Cross, Sadashivanagar, Bengaluru",
+    "lat": 13.01249,
+    "lon": 77.58429,
+    "cuisines": [
+      "Continental",
+      "Grill"
+    ],
+    "price_band": 4,
+    "cost_for_two": 3950,
+    "capacity": 70,
+    "opens": "18:00",
+    "closes": "00:00",
+    "rating": 4.7,
+    "phone": "080-43970445",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "bar",
+      "parking",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R020",
+    "name": "GoodFoods The Grill Room, Sarjapur Road",
+    "concept": "The Grill Room",
+    "area": "Sarjapur Road",
+    "address": "202, 1st Cross, Sarjapur Road, Bengaluru",
+    "lat": 12.90547,
+    "lon": 77.6913,
+    "cuisines": [
+      "Continental",
+      "Grill"
+    ],
+    "price_band": 4,
+    "cost_for_two": 2850,
+    "capacity": 70,
+    "opens": "18:00",
+    "closes": "00:00",
+    "rating": 4.6,
+    "phone": "080-48722606",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "bar",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R021",
+    "name": "GoodFoods Trattoria, Bannerghatta Road",
+    "concept": "Trattoria",
+    "area": "Bannerghatta Road",
+    "address": "72, 6th Cross, Bannerghatta Road, Bengaluru",
+    "lat": 12.89015,
+    "lon": 77.60112,
+    "cuisines": [
+      "Italian",
+      "Pizza"
+    ],
+    "price_band": 3,
+    "cost_for_two": 1900,
+    "capacity": 40,
+    "opens": "12:00",
+    "closes": "23:30",
+    "rating": 3.9,
+    "phone": "080-45382463",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "kid_friendly",
+      "bar",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R022",
+    "name": "GoodFoods Coast & Curry, Kalyan Nagar",
+    "concept": "Coast & Curry",
+    "area": "Kalyan Nagar",
+    "address": "30, 8th Main, Kalyan Nagar, Bengaluru",
+    "lat": 13.02506,
+    "lon": 77.64251,
+    "cuisines": [
+      "Coastal",
+      "Seafood"
+    ],
+    "price_band": 3,
+    "cost_for_two": 1400,
+    "capacity": 70,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.2,
+    "phone": "080-42173965",
+    "features": [
+      "private_dining",
+      "bar"
+    ]
+  },
+  {
+    "id": "R023",
+    "name": "GoodFoods Green Bowl, Ulsoor",
+    "concept": "Green Bowl",
+    "area": "Ulsoor",
+    "address": "179, 6th Main, Ulsoor, Bengaluru",
+    "lat": 12.9773,
+    "lon": 77.62198,
+    "cuisines": [
+      "Vegetarian",
+      "Healthy"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1100,
+    "capacity": 60,
+    "opens": "08:00",
+    "closes": "22:30",
+    "rating": 4.4,
+    "phone": "080-46049101",
+    "features": [
+      "veg_friendly",
+      "kid_friendly",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R024",
+    "name": "GoodFoods The Grill Room, Domlur",
+    "concept": "The Grill Room",
+    "area": "Domlur",
+    "address": "55, 12th Cross, Domlur, Bengaluru",
+    "lat": 12.96442,
+    "lon": 77.64422,
+    "cuisines": [
+      "Continental",
+      "Grill"
+    ],
+    "price_band": 4,
+    "cost_for_two": 3650,
+    "capacity": 60,
+    "opens": "18:00",
+    "closes": "00:00",
+    "rating": 4.5,
+    "phone": "080-45761145",
+    "features": [
+      "outdoor_seating",
+      "private_dining",
+      "bar"
+    ]
+  },
+  {
+    "id": "R025",
+    "name": "GoodFoods Sakura, Koramangala",
+    "concept": "Sakura",
+    "area": "Koramangala",
+    "address": "12, 4th Cross, Koramangala, Bengaluru",
+    "lat": 12.93654,
+    "lon": 77.62772,
+    "cuisines": [
+      "Japanese",
+      "Sushi"
+    ],
+    "price_band": 4,
+    "cost_for_two": 3200,
+    "capacity": 120,
+    "opens": "12:30",
+    "closes": "23:00",
+    "rating": 4.7,
+    "phone": "080-44262081",
+    "features": [
+      "private_dining",
+      "bar",
+      "live_music",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R026",
+    "name": "GoodFoods Café GoodFoods, Indiranagar",
+    "concept": "Café GoodFoods",
+    "area": "Indiranagar",
+    "address": "109, 4th Main, Indiranagar, Bengaluru",
+    "lat": 12.98205,
+    "lon": 77.64315,
+    "cuisines": [
+      "Cafe",
+      "Bakery"
+    ],
+    "price_band": 1,
+    "cost_for_two": 550,
+    "capacity": 40,
+    "opens": "08:00",
+    "closes": "22:00",
+    "rating": 4.4,
+    "phone": "080-43036059",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R027",
+    "name": "GoodFoods Mezze, HSR Layout",
+    "concept": "Mezze",
+    "area": "HSR Layout",
+    "address": "229, 12th Cross, HSR Layout, Bengaluru",
+    "lat": 12.91557,
+    "lon": 77.64797,
+    "cuisines": [
+      "Mediterranean",
+      "Middle Eastern"
+    ],
+    "price_band": 3,
+    "cost_for_two": 1650,
+    "capacity": 150,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.3,
+    "phone": "080-45147994",
+    "features": [
+      "veg_friendly",
+      "bar"
+    ]
+  },
+  {
+    "id": "R028",
+    "name": "GoodFoods Green Bowl, Whitefield",
+    "concept": "Green Bowl",
+    "area": "Whitefield",
+    "address": "229, 12th Main, Whitefield, Bengaluru",
+    "lat": 12.96546,
+    "lon": 77.74678,
+    "cuisines": [
+      "Vegetarian",
+      "Healthy"
+    ],
+    "price_band": 2,
+    "cost_for_two": 900,
+    "capacity": 70,
+    "opens": "08:00",
+    "closes": "22:30",
+    "rating": 3.9,
+    "phone": "080-47838382",
+    "features": [
+      "veg_friendly",
+      "kid_friendly",
+      "parking",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R029",
+    "name": "GoodFoods Trattoria, Jayanagar",
+    "concept": "Trattoria",
+    "area": "Jayanagar",
+    "address": "196, 12th Cross, Jayanagar, Bengaluru",
+    "lat": 12.92472,
+    "lon": 77.59911,
+    "cuisines": [
+      "Italian",
+      "Pizza"
+    ],
+    "price_band": 3,
+    "cost_for_two": 1850,
+    "capacity": 120,
+    "opens": "12:00",
+    "closes": "23:30",
+    "rating": 4.7,
+    "phone": "080-48030010",
+    "features": [
+      "private_dining"
+    ]
+  },
+  {
+    "id": "R030",
+    "name": "GoodFoods Sakura, JP Nagar",
+    "concept": "Sakura",
+    "area": "JP Nagar",
+    "address": "174, 8th Main, JP Nagar, Bengaluru",
+    "lat": 12.91039,
+    "lon": 77.59073,
+    "cuisines": [
+      "Japanese",
+      "Sushi"
+    ],
+    "price_band": 4,
+    "cost_for_two": 3450,
+    "capacity": 40,
+    "opens": "12:30",
+    "closes": "23:00",
+    "rating": 4.7,
+    "phone": "080-41454696",
+    "features": [
+      "kid_friendly",
+      "bar",
+      "parking",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R031",
+    "name": "GoodFoods Dakshin, MG Road",
+    "concept": "Dakshin",
+    "area": "MG Road",
+    "address": "98, 6th Cross, MG Road, Bengaluru",
+    "lat": 12.97263,
+    "lon": 77.59998,
+    "cuisines": [
+      "South Indian"
+    ],
+    "price_band": 1,
+    "cost_for_two": 400,
+    "capacity": 40,
+    "opens": "07:30",
+    "closes": "22:30",
+    "rating": 4.8,
+    "phone": "080-46871360",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "kid_friendly",
+      "bar",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R032",
+    "name": "GoodFoods Andhra Spice, Malleshwaram",
+    "concept": "Andhra Spice",
+    "area": "Malleshwaram",
+    "address": "33, 8th Main, Malleshwaram, Bengaluru",
+    "lat": 13.00387,
+    "lon": 77.56092,
+    "cuisines": [
+      "Andhra",
+      "South Indian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1000,
+    "capacity": 100,
+    "opens": "11:30",
+    "closes": "23:00",
+    "rating": 4.0,
+    "phone": "080-42921542",
+    "features": [
+      "live_music",
+      "parking",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R033",
+    "name": "GoodFoods Coast & Curry, Basavanagudi",
+    "concept": "Coast & Curry",
+    "area": "Basavanagudi",
+    "address": "20, 12th Main, Basavanagudi, Bengaluru",
+    "lat": 12.93582,
+    "lon": 77.57707,
+    "cuisines": [
+      "Coastal",
+      "Seafood"
+    ],
+    "price_band": 3,
+    "cost_for_two": 1550,
+    "capacity": 40,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.1,
+    "phone": "080-48186990",
+    "features": [
+      "outdoor_seating",
+      "private_dining",
+      "kid_friendly",
+      "parking"
+    ]
+  },
+  {
+    "id": "R034",
+    "name": "GoodFoods Green Bowl, BTM Layout",
+    "concept": "Green Bowl",
+    "area": "BTM Layout",
+    "address": "213, 8th Main, BTM Layout, Bengaluru",
+    "lat": 12.91583,
+    "lon": 77.61291,
+    "cuisines": [
+      "Vegetarian",
+      "Healthy"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1300,
+    "capacity": 80,
+    "opens": "08:00",
+    "closes": "22:30",
+    "rating": 4.4,
+    "phone": "080-49111742",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R035",
+    "name": "GoodFoods Mezze, Electronic City",
+    "concept": "Mezze",
+    "area": "Electronic City",
+    "address": "119, 12th Cross, Electronic City, Bengaluru",
+    "lat": 12.84324,
+    "lon": 77.66013,
+    "cuisines": [
+      "Mediterranean",
+      "Middle Eastern"
+    ],
+    "price_band": 3,
+    "cost_for_two": 1900,
+    "capacity": 60,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.3,
+    "phone": "080-46952975",
+    "features": [
+      "private_dining",
+      "live_music",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R036",
+    "name": "GoodFoods Wok Street, Marathahalli",
+    "concept": "Wok Street",
+    "area": "Marathahalli",
+    "address": "126, 12th Main, Marathahalli, Bengaluru",
+    "lat": 12.96139,
+    "lon": 77.69915,
+    "cuisines": [
+      "Chinese",
+      "Pan-Asian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1150,
+    "capacity": 150,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.6,
+    "phone": "080-42561176",
+    "features": [
+      "veg_friendly",
+      "kid_friendly",
+      "bar",
+      "parking"
+    ]
+  },
+  {
+    "id": "R037",
+    "name": "GoodFoods Wok Street, Bellandur",
+    "concept": "Wok Street",
+    "area": "Bellandur",
+    "address": "85, 6th Cross, Bellandur, Bengaluru",
+    "lat": 12.92765,
+    "lon": 77.67542,
+    "cuisines": [
+      "Chinese",
+      "Pan-Asian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 850,
+    "capacity": 70,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.1,
+    "phone": "080-49990305",
+    "features": [
+      "veg_friendly",
+      "private_dining"
+    ]
+  },
+  {
+    "id": "R038",
+    "name": "GoodFoods Café GoodFoods, Hebbal",
+    "concept": "Café GoodFoods",
+    "area": "Hebbal",
+    "address": "50, 6th Main, Hebbal, Bengaluru",
+    "lat": 13.03413,
+    "lon": 77.59463,
+    "cuisines": [
+      "Cafe",
+      "Bakery"
+    ],
+    "price_band": 1,
+    "cost_for_two": 650,
+    "capacity": 60,
+    "opens": "08:00",
+    "closes": "22:00",
+    "rating": 4.1,
+    "phone": "080-41914794",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "parking",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R039",
+    "name": "GoodFoods Sakura, Yelahanka",
+    "concept": "Sakura",
+    "area": "Yelahanka",
+    "address": "88, 4th Main, Yelahanka, Bengaluru",
+    "lat": 13.09773,
+    "lon": 77.60064,
+    "cuisines": [
+      "Japanese",
+      "Sushi"
+    ],
+    "price_band": 4,
+    "cost_for_two": 2650,
+    "capacity": 50,
+    "opens": "12:30",
+    "closes": "23:00",
+    "rating": 4.2,
+    "phone": "080-42242892",
+    "features": [
+      "veg_friendly",
+      "bar",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R040",
+    "name": "GoodFoods Chettinad Table, Rajajinagar",
+    "concept": "Chettinad Table",
+    "area": "Rajajinagar",
+    "address": "156, 12th Main, Rajajinagar, Bengaluru",
+    "lat": 12.99441,
+    "lon": 77.55356,
+    "cuisines": [
+      "Chettinad",
+      "South Indian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1150,
+    "capacity": 80,
+    "opens": "11:30",
+    "closes": "23:00",
+    "rating": 4.7,
+    "phone": "080-48194570",
+    "features": [
+      "outdoor_seating",
+      "private_dining",
+      "bar",
+      "parking"
+    ]
+  },
+  {
+    "id": "R041",
+    "name": "GoodFoods Wok Street, Banashankari",
+    "concept": "Wok Street",
+    "area": "Banashankari",
+    "address": "62, 4th Main, Banashankari, Bengaluru",
+    "lat": 12.92138,
+    "lon": 77.5457,
+    "cuisines": [
+      "Chinese",
+      "Pan-Asian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1250,
+    "capacity": 150,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.1,
+    "phone": "080-44883526",
+    "features": [
+      "outdoor_seating",
+      "kid_friendly",
+      "parking",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R042",
+    "name": "GoodFoods Wok Street, Frazer Town",
+    "concept": "Wok Street",
+    "area": "Frazer Town",
+    "address": "240, 4th Cross, Frazer Town, Bengaluru",
+    "lat": 12.99208,
+    "lon": 77.61,
+    "cuisines": [
+      "Chinese",
+      "Pan-Asian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 900,
+    "capacity": 80,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.6,
+    "phone": "080-42198058",
+    "features": []
+  },
+  {
+    "id": "R043",
+    "name": "GoodFoods Tandoor House, Sadashivanagar",
+    "concept": "Tandoor House",
+    "area": "Sadashivanagar",
+    "address": "242, 6th Cross, Sadashivanagar, Bengaluru",
+    "lat": 13.00605,
+    "lon": 77.58248,
+    "cuisines": [
+      "North Indian",
+      "Mughlai"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1100,
+    "capacity": 100,
+    "opens": "12:00",
+    "closes": "23:30",
+    "rating": 4.4,
+    "phone": "080-41433940",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "bar",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R044",
+    "name": "GoodFoods Dakshin, Sarjapur Road",
+    "concept": "Dakshin",
+    "area": "Sarjapur Road",
+    "address": "196, 4th Cross, Sarjapur Road, Bengaluru",
+    "lat": 12.90123,
+    "lon": 77.68631,
+    "cuisines": [
+      "South Indian"
+    ],
+    "price_band": 1,
+    "cost_for_two": 500,
+    "capacity": 60,
+    "opens": "07:30",
+    "closes": "22:30",
+    "rating": 4.8,
+    "phone": "080-48312936",
+    "features": [
+      "veg_friendly",
+      "bar"
+    ]
+  },
+  {
+    "id": "R045",
+    "name": "GoodFoods Green Bowl, Bannerghatta Road",
+    "concept": "Green Bowl",
+    "area": "Bannerghatta Road",
+    "address": "127, 6th Cross, Bannerghatta Road, Bengaluru",
+    "lat": 12.89176,
+    "lon": 77.5976,
+    "cuisines": [
+      "Vegetarian",
+      "Healthy"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1150,
+    "capacity": 50,
+    "opens": "08:00",
+    "closes": "22:30",
+    "rating": 4.1,
+    "phone": "080-46423634",
+    "features": [
+      "veg_friendly",
+      "bar",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R046",
+    "name": "GoodFoods Dakshin, Kalyan Nagar",
+    "concept": "Dakshin",
+    "area": "Kalyan Nagar",
+    "address": "93, 12th Cross, Kalyan Nagar, Bengaluru",
+    "lat": 13.0295,
+    "lon": 77.64312,
+    "cuisines": [
+      "South Indian"
+    ],
+    "price_band": 1,
+    "cost_for_two": 450,
+    "capacity": 80,
+    "opens": "07:30",
+    "closes": "22:30",
+    "rating": 4.3,
+    "phone": "080-45832327",
+    "features": [
+      "veg_friendly",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R047",
+    "name": "GoodFoods Mezze, Ulsoor",
+    "concept": "Mezze",
+    "area": "Ulsoor",
+    "address": "105, 1st Main, Ulsoor, Bengaluru",
+    "lat": 12.98691,
+    "lon": 77.62496,
+    "cuisines": [
+      "Mediterranean",
+      "Middle Eastern"
+    ],
+    "price_band": 3,
+    "cost_for_two": 2100,
+    "capacity": 50,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.4,
+    "phone": "080-43583206",
+    "features": [
+      "private_dining",
+      "parking",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R048",
+    "name": "GoodFoods Mezze, Domlur",
+    "concept": "Mezze",
+    "area": "Domlur",
+    "address": "49, 12th Main, Domlur, Bengaluru",
+    "lat": 12.96527,
+    "lon": 77.63601,
+    "cuisines": [
+      "Mediterranean",
+      "Middle Eastern"
+    ],
+    "price_band": 3,
+    "cost_for_two": 2050,
+    "capacity": 100,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.7,
+    "phone": "080-49518424",
+    "features": [
+      "outdoor_seating",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R049",
+    "name": "GoodFoods Wok Street, Koramangala",
+    "concept": "Wok Street",
+    "area": "Koramangala",
+    "address": "89, 6th Cross, Koramangala, Bengaluru",
+    "lat": 12.93466,
+    "lon": 77.62236,
+    "cuisines": [
+      "Chinese",
+      "Pan-Asian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 950,
+    "capacity": 70,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.4,
+    "phone": "080-44918527",
+    "features": [
+      "outdoor_seating",
+      "private_dining",
+      "parking"
+    ]
+  },
+  {
+    "id": "R050",
+    "name": "GoodFoods The Grill Room, Indiranagar",
+    "concept": "The Grill Room",
+    "area": "Indiranagar",
+    "address": "127, 1st Main, Indiranagar, Bengaluru",
+    "lat": 12.97843,
+    "lon": 77.64188,
+    "cuisines": [
+      "Continental",
+      "Grill"
+    ],
+    "price_band": 4,
+    "cost_for_two": 3850,
+    "capacity": 50,
+    "opens": "18:00",
+    "closes": "00:00",
+    "rating": 4.7,
+    "phone": "080-48387112",
+    "features": [
+      "veg_friendly",
+      "bar"
+    ]
+  },
+  {
+    "id": "R051",
+    "name": "GoodFoods Dakshin, HSR Layout",
+    "concept": "Dakshin",
+    "area": "HSR Layout",
+    "address": "87, 12th Cross, HSR Layout, Bengaluru",
+    "lat": 12.9134,
+    "lon": 77.65162,
+    "cuisines": [
+      "South Indian"
+    ],
+    "price_band": 1,
+    "cost_for_two": 700,
+    "capacity": 120,
+    "opens": "07:30",
+    "closes": "22:30",
+    "rating": 4.8,
+    "phone": "080-49186400",
+    "features": [
+      "veg_friendly",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R052",
+    "name": "GoodFoods Sakura, Whitefield",
+    "concept": "Sakura",
+    "area": "Whitefield",
+    "address": "163, 1st Cross, Whitefield, Bengaluru",
+    "lat": 12.9658,
+    "lon": 77.74759,
+    "cuisines": [
+      "Japanese",
+      "Sushi"
+    ],
+    "price_band": 4,
+    "cost_for_two": 2500,
+    "capacity": 40,
+    "opens": "12:30",
+    "closes": "23:00",
+    "rating": 4.1,
+    "phone": "080-41941524",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "bar",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R053",
+    "name": "GoodFoods Wok Street, Jayanagar",
+    "concept": "Wok Street",
+    "area": "Jayanagar",
+    "address": "98, 12th Main, Jayanagar, Bengaluru",
+    "lat": 12.92497,
+    "lon": 77.5948,
+    "cuisines": [
+      "Chinese",
+      "Pan-Asian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 950,
+    "capacity": 150,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.4,
+    "phone": "080-48710313",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R054",
+    "name": "GoodFoods Wok Street, JP Nagar",
+    "concept": "Wok Street",
+    "area": "JP Nagar",
+    "address": "77, 8th Cross, JP Nagar, Bengaluru",
+    "lat": 12.90578,
+    "lon": 77.58333,
+    "cuisines": [
+      "Chinese",
+      "Pan-Asian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1100,
+    "capacity": 150,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 3.9,
+    "phone": "080-47398231",
+    "features": [
+      "kid_friendly",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R055",
+    "name": "GoodFoods Chettinad Table, MG Road",
+    "concept": "Chettinad Table",
+    "area": "MG Road",
+    "address": "200, 1st Cross, MG Road, Bengaluru",
+    "lat": 12.97959,
+    "lon": 77.60984,
+    "cuisines": [
+      "Chettinad",
+      "South Indian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 950,
+    "capacity": 100,
+    "opens": "11:30",
+    "closes": "23:00",
+    "rating": 4.0,
+    "phone": "080-44189885",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "kid_friendly",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R056",
+    "name": "GoodFoods Chettinad Table, Malleshwaram II",
+    "concept": "Chettinad Table",
+    "area": "Malleshwaram",
+    "address": "202, 8th Main, Malleshwaram, Bengaluru",
+    "lat": 13.00405,
+    "lon": 77.56709,
+    "cuisines": [
+      "Chettinad",
+      "South Indian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 850,
+    "capacity": 80,
+    "opens": "11:30",
+    "closes": "23:00",
+    "rating": 4.1,
+    "phone": "080-47970985",
+    "features": [
+      "veg_friendly",
+      "bar",
+      "live_music",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R057",
+    "name": "GoodFoods Coast & Curry, Basavanagudi II",
+    "concept": "Coast & Curry",
+    "area": "Basavanagudi",
+    "address": "242, 8th Cross, Basavanagudi, Bengaluru",
+    "lat": 12.94356,
+    "lon": 77.57186,
+    "cuisines": [
+      "Coastal",
+      "Seafood"
+    ],
+    "price_band": 3,
+    "cost_for_two": 1550,
+    "capacity": 150,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.8,
+    "phone": "080-43361510",
+    "features": [
+      "veg_friendly",
+      "kid_friendly",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R058",
+    "name": "GoodFoods Andhra Spice, BTM Layout",
+    "concept": "Andhra Spice",
+    "area": "BTM Layout",
+    "address": "138, 1st Cross, BTM Layout, Bengaluru",
+    "lat": 12.91502,
+    "lon": 77.61309,
+    "cuisines": [
+      "Andhra",
+      "South Indian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1000,
+    "capacity": 120,
+    "opens": "11:30",
+    "closes": "23:00",
+    "rating": 4.6,
+    "phone": "080-47232293",
+    "features": [
+      "live_music",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R059",
+    "name": "GoodFoods Dakshin, Electronic City",
+    "concept": "Dakshin",
+    "area": "Electronic City",
+    "address": "119, 6th Cross, Electronic City, Bengaluru",
+    "lat": 12.8406,
+    "lon": 77.65474,
+    "cuisines": [
+      "South Indian"
+    ],
+    "price_band": 1,
+    "cost_for_two": 400,
+    "capacity": 80,
+    "opens": "07:30",
+    "closes": "22:30",
+    "rating": 4.8,
+    "phone": "080-42948178",
+    "features": [
+      "veg_friendly",
+      "bar"
+    ]
+  },
+  {
+    "id": "R060",
+    "name": "GoodFoods Dakshin, Marathahalli II",
+    "concept": "Dakshin",
+    "area": "Marathahalli",
+    "address": "187, 4th Cross, Marathahalli, Bengaluru",
+    "lat": 12.96096,
+    "lon": 77.7014,
+    "cuisines": [
+      "South Indian"
+    ],
+    "price_band": 1,
+    "cost_for_two": 600,
+    "capacity": 120,
+    "opens": "07:30",
+    "closes": "22:30",
+    "rating": 4.7,
+    "phone": "080-45693260",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "kid_friendly"
+    ]
+  },
+  {
+    "id": "R061",
+    "name": "GoodFoods Tandoor House, Bellandur",
+    "concept": "Tandoor House",
+    "area": "Bellandur",
+    "address": "166, 6th Main, Bellandur, Bengaluru",
+    "lat": 12.92918,
+    "lon": 77.67468,
+    "cuisines": [
+      "North Indian",
+      "Mughlai"
+    ],
+    "price_band": 2,
+    "cost_for_two": 850,
+    "capacity": 150,
+    "opens": "12:00",
+    "closes": "23:30",
+    "rating": 3.9,
+    "phone": "080-44558545",
+    "features": [
+      "outdoor_seating",
+      "kid_friendly",
+      "bar",
+      "parking"
+    ]
+  },
+  {
+    "id": "R062",
+    "name": "GoodFoods Green Bowl, Hebbal",
+    "concept": "Green Bowl",
+    "area": "Hebbal",
+    "address": "142, 4th Main, Hebbal, Bengaluru",
+    "lat": 13.03956,
+    "lon": 77.5938,
+    "cuisines": [
+      "Vegetarian",
+      "Healthy"
+    ],
+    "price_band": 2,
+    "cost_for_two": 900,
+    "capacity": 40,
+    "opens": "08:00",
+    "closes": "22:30",
+    "rating": 4.1,
+    "phone": "080-43427461",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "kid_friendly",
+      "parking"
+    ]
+  },
+  {
+    "id": "R063",
+    "name": "GoodFoods Coast & Curry, Yelahanka",
+    "concept": "Coast & Curry",
+    "area": "Yelahanka",
+    "address": "5, 4th Cross, Yelahanka, Bengaluru",
+    "lat": 13.09533,
+    "lon": 77.5992,
+    "cuisines": [
+      "Coastal",
+      "Seafood"
+    ],
+    "price_band": 3,
+    "cost_for_two": 2200,
+    "capacity": 50,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.5,
+    "phone": "080-48990081",
+    "features": [
+      "private_dining",
+      "bar",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R064",
+    "name": "GoodFoods Mezze, Rajajinagar",
+    "concept": "Mezze",
+    "area": "Rajajinagar",
+    "address": "134, 6th Cross, Rajajinagar, Bengaluru",
+    "lat": 12.99282,
+    "lon": 77.54937,
+    "cuisines": [
+      "Mediterranean",
+      "Middle Eastern"
+    ],
+    "price_band": 3,
+    "cost_for_two": 2150,
+    "capacity": 120,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.2,
+    "phone": "080-42811298",
+    "features": [
+      "private_dining",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R065",
+    "name": "GoodFoods Mezze, Banashankari",
+    "concept": "Mezze",
+    "area": "Banashankari",
+    "address": "183, 6th Cross, Banashankari, Bengaluru",
+    "lat": 12.93144,
+    "lon": 77.54717,
+    "cuisines": [
+      "Mediterranean",
+      "Middle Eastern"
+    ],
+    "price_band": 3,
+    "cost_for_two": 2100,
+    "capacity": 120,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 3.9,
+    "phone": "080-42919549",
+    "features": [
+      "kid_friendly",
+      "bar",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R066",
+    "name": "GoodFoods Green Bowl, Frazer Town",
+    "concept": "Green Bowl",
+    "area": "Frazer Town",
+    "address": "107, 1st Cross, Frazer Town, Bengaluru",
+    "lat": 12.99582,
+    "lon": 77.61528,
+    "cuisines": [
+      "Vegetarian",
+      "Healthy"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1050,
+    "capacity": 60,
+    "opens": "08:00",
+    "closes": "22:30",
+    "rating": 4.5,
+    "phone": "080-48956894",
+    "features": [
+      "veg_friendly",
+      "kid_friendly",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R067",
+    "name": "GoodFoods Dakshin, Sadashivanagar",
+    "concept": "Dakshin",
+    "area": "Sadashivanagar",
+    "address": "144, 6th Main, Sadashivanagar, Bengaluru",
+    "lat": 13.00573,
+    "lon": 77.58578,
+    "cuisines": [
+      "South Indian"
+    ],
+    "price_band": 1,
+    "cost_for_two": 700,
+    "capacity": 120,
+    "opens": "07:30",
+    "closes": "22:30",
+    "rating": 4.7,
+    "phone": "080-41863121",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "bar",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R068",
+    "name": "GoodFoods Wok Street, Sarjapur Road",
+    "concept": "Wok Street",
+    "area": "Sarjapur Road",
+    "address": "95, 1st Cross, Sarjapur Road, Bengaluru",
+    "lat": 12.90189,
+    "lon": 77.69069,
+    "cuisines": [
+      "Chinese",
+      "Pan-Asian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1200,
+    "capacity": 40,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.4,
+    "phone": "080-45487028",
+    "features": [
+      "outdoor_seating",
+      "kid_friendly",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R069",
+    "name": "GoodFoods Tandoor House, Bannerghatta Road",
+    "concept": "Tandoor House",
+    "area": "Bannerghatta Road",
+    "address": "37, 1st Main, Bannerghatta Road, Bengaluru",
+    "lat": 12.89095,
+    "lon": 77.59358,
+    "cuisines": [
+      "North Indian",
+      "Mughlai"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1100,
+    "capacity": 150,
+    "opens": "12:00",
+    "closes": "23:30",
+    "rating": 4.1,
+    "phone": "080-47208460",
+    "features": [
+      "veg_friendly",
+      "private_dining",
+      "kid_friendly",
+      "bar"
+    ]
+  },
+  {
+    "id": "R070",
+    "name": "GoodFoods Wok Street, Kalyan Nagar",
+    "concept": "Wok Street",
+    "area": "Kalyan Nagar",
+    "address": "70, 8th Cross, Kalyan Nagar, Bengaluru",
+    "lat": 13.02783,
+    "lon": 77.6393,
+    "cuisines": [
+      "Chinese",
+      "Pan-Asian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 1000,
+    "capacity": 70,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.6,
+    "phone": "080-42909540",
+    "features": [
+      "kid_friendly",
+      "bar",
+      "live_music"
+    ]
+  },
+  {
+    "id": "R071",
+    "name": "GoodFoods Trattoria, Ulsoor",
+    "concept": "Trattoria",
+    "area": "Ulsoor",
+    "address": "2, 4th Cross, Ulsoor, Bengaluru",
+    "lat": 12.98634,
+    "lon": 77.62321,
+    "cuisines": [
+      "Italian",
+      "Pizza"
+    ],
+    "price_band": 3,
+    "cost_for_two": 1800,
+    "capacity": 80,
+    "opens": "12:00",
+    "closes": "23:30",
+    "rating": 4.1,
+    "phone": "080-41129686",
+    "features": [
+      "outdoor_seating",
+      "live_music",
+      "parking"
+    ]
+  },
+  {
+    "id": "R072",
+    "name": "GoodFoods Mezze, Domlur II",
+    "concept": "Mezze",
+    "area": "Domlur",
+    "address": "221, 1st Cross, Domlur, Bengaluru",
+    "lat": 12.95512,
+    "lon": 77.64375,
+    "cuisines": [
+      "Mediterranean",
+      "Middle Eastern"
+    ],
+    "price_band": 3,
+    "cost_for_two": 1900,
+    "capacity": 120,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.4,
+    "phone": "080-48007741",
+    "features": [
+      "outdoor_seating",
+      "private_dining",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R073",
+    "name": "GoodFoods Wok Street, Koramangala II",
+    "concept": "Wok Street",
+    "area": "Koramangala",
+    "address": "217, 1st Main, Koramangala, Bengaluru",
+    "lat": 12.93443,
+    "lon": 77.62331,
+    "cuisines": [
+      "Chinese",
+      "Pan-Asian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 850,
+    "capacity": 120,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.7,
+    "phone": "080-46696087",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "private_dining",
+      "wheelchair_accessible"
+    ]
+  },
+  {
+    "id": "R074",
+    "name": "GoodFoods Andhra Spice, Indiranagar II",
+    "concept": "Andhra Spice",
+    "area": "Indiranagar",
+    "address": "210, 4th Main, Indiranagar, Bengaluru",
+    "lat": 12.97363,
+    "lon": 77.63787,
+    "cuisines": [
+      "Andhra",
+      "South Indian"
+    ],
+    "price_band": 2,
+    "cost_for_two": 900,
+    "capacity": 60,
+    "opens": "11:30",
+    "closes": "23:00",
+    "rating": 4.6,
+    "phone": "080-42264218",
+    "features": [
+      "veg_friendly",
+      "outdoor_seating",
+      "kid_friendly",
+      "parking"
+    ]
+  },
+  {
+    "id": "R075",
+    "name": "GoodFoods Coast & Curry, HSR Layout",
+    "concept": "Coast & Curry",
+    "area": "HSR Layout",
+    "address": "160, 6th Cross, HSR Layout, Bengaluru",
+    "lat": 12.90741,
+    "lon": 77.64222,
+    "cuisines": [
+      "Coastal",
+      "Seafood"
+    ],
+    "price_band": 3,
+    "cost_for_two": 2100,
+    "capacity": 80,
+    "opens": "12:00",
+    "closes": "23:00",
+    "rating": 4.6,
+    "phone": "080-41942411",
+    "features": []
+  }
+]
