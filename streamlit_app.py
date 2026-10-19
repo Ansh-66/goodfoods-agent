@@ -66,14 +66,31 @@ async def take_turn(text: str) -> TurnResult:
         return await run_turn(st.session_state.conversation, text, GroqModel(), session)
 
 
-def render(entry: dict, autoplay: bool = False) -> None:
+def render(entry: dict, index: int) -> None:
     if entry.get("note"):
         st.caption(entry["note"])
-    st.markdown(entry["text"])
+    listen = False
+    if VOICE_ENABLED and entry["role"] == "assistant":
+        text_column, button_column = st.columns([14, 1])
+        text_column.markdown(entry["text"])
+        listen = button_column.button(
+            "", icon=":material/volume_up:", key=f"listen{index}", type="tertiary", help="Listen"
+        )
+    else:
+        st.markdown(entry["text"])
     if entry.get("english"):
         st.caption(f"English: {entry['english']}")
+    language = entry.get("language", ENGLISH)
+    if listen and "audio" not in entry:  # speech is generated on first request, then kept
+        try:
+            entry["audio"] = asyncio.run(Voice().speak(entry["text"], language))
+        except SarvamError as e:
+            log.error("text-to-speech failed: %s", e)
+            st.warning("Couldn't generate the audio right now. Please try again.")
     if entry.get("audio"):
-        st.audio(entry["audio"], format="audio/wav", autoplay=autoplay)
+        st.audio(entry["audio"], format="audio/wav", autoplay=listen)
+    elif listen and "audio" in entry:
+        st.caption(f"Audio isn't available in {language_name(language)}.")
     turn = entry.get("turn")
     if not turn:
         return
@@ -96,7 +113,7 @@ def render(entry: dict, autoplay: bool = False) -> None:
 def show(entry: dict) -> None:
     st.session_state.transcript.append(entry)
     with st.chat_message(entry["role"]):
-        render(entry, autoplay=True)
+        render(entry, len(st.session_state.transcript) - 1)
 
 
 with st.sidebar:
@@ -117,9 +134,9 @@ if not os.environ.get("GROQ_API_KEY"):
     st.error("GROQ_API_KEY is not set. Add it to .env (see .env.example) and restart.")
     st.stop()
 
-for entry in st.session_state.transcript:
+for i, entry in enumerate(st.session_state.transcript):
     with st.chat_message(entry["role"]):
-        render(entry)
+        render(entry, i)
 
 if not st.session_state.transcript:
     with st.chat_message("assistant"):
@@ -169,14 +186,11 @@ if guest_text:
             st.stop()
         seconds = time.perf_counter() - started
 
-    reply = {"role": "assistant", "text": turn.reply, "turn": turn, "seconds": seconds}
-    if not typed:  # answer a spoken message in the guest's language, out loud
+    reply = {"role": "assistant", "text": turn.reply, "turn": turn, "seconds": seconds, "language": language}
+    if language != ENGLISH:  # answer in the language the guest spoke
         try:
-            spoken = asyncio.run(Voice().reply(turn.reply, language))
-            reply.update(audio=spoken.audio)
-            if language != ENGLISH:
-                reply.update(text=spoken.text, english=turn.reply)
+            reply.update(text=asyncio.run(Voice().translate(turn.reply, language)), english=turn.reply)
         except SarvamError as e:
-            log.error("translation or speech failed: %s", e)
-            reply.update(note="Voice reply unavailable; showing the English answer.")
+            log.error("translation failed: %s", e)
+            reply.update(note="Translation unavailable; showing the English answer.", language=ENGLISH)
     show(reply)

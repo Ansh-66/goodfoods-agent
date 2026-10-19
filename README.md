@@ -53,7 +53,7 @@ streamlit run streamlit_app.py
 **Checks**
 
 ```bash
-pytest                             # 43 tests, no API key needed (the model is scripted)
+pytest                             # 45 tests, no API key needed (the model is scripted)
 ruff check . && ruff format --check .
 python evals/run_eval.py           # live evaluation against Groq; uses a large share of the free daily quota
 ```
@@ -80,7 +80,7 @@ flowchart LR
 
 | Layer | Responsibility |
 |---|---|
-| `streamlit_app.py` | Chat UI with a voice recorder. Shows each reply with the tools it used, their arguments and results, and the model calls, tokens and time per turn. |
+| `streamlit_app.py` | Chat UI; the input box takes typing or a voice recording, and each reply has a speaker button. Shows each reply with the tools it used, their arguments and results, and the model calls, tokens and time per turn. |
 | `goodfoods/voice.py` | Speech and language layer around the agent (Sarvam Saaras, Mayura, Bulbul). |
 | `goodfoods/agent/` | The loop, the system prompt and the model wrapper. Owns conversation state and the confirmation gate. |
 | `goodfoods/server.py` | Eight MCP tools. Thin wrappers that turn rule violations into readable results. |
@@ -124,9 +124,9 @@ The model decides intent; there are no keyword rules on the guest's text. Code e
 
 Language lives at the edges, not in the agent (`goodfoods/voice.py`):
 
-1. The guest records a message in English or an Indian language. Sarvam **Saaras** (speech-to-text in translate mode) returns English text and the detected language.
+1. The guest records a message in English or an Indian language. Sarvam **Saaras** (speech-to-text in translate mode) returns English text and the detected language. The neighbourhood names and "GoodFoods" are sent as recognition hints, so "Koramangala" is not heard as "Porumangala".
 2. The English text goes through the same agent loop, prompt, tools and confirmation gate as typed input.
-3. The English reply is translated into the guest's language with **Mayura** (colloquial register, digits kept as digits so times and booking ids survive) and spoken with **Bulbul**.
+3. The English reply is translated into the guest's language with **Mayura** (colloquial register, digits kept as digits so times and booking ids survive). A speaker button beside every reply, typed or spoken, reads it aloud with **Bulbul**; audio is generated only on request, so nothing plays by itself and no speech credits are spent on replies nobody listens to.
 
 So the agent, its prompt and its evaluation stay English-only, and supporting another language changes nothing behind this module. Replies are spoken in 11 languages (English, Hindi, Bengali, Gujarati, Kannada, Malayalam, Marathi, Odia, Punjabi, Tamil, Telugu); for other languages Saaras recognises, the reply is translated but shown as text. Every translated reply also shows the English original.
 
@@ -206,7 +206,7 @@ goodfoods/
   db.py, setup_db.py, generate_data.py, config.py, errors.py
 streamlit_app.py    chat UI
 evals/              cases.json, run_eval.py, results
-tests/              43 tests: rules, MCP server, agent loop, voice layer, UI, eval harness
+tests/              45 tests: rules, MCP server, agent loop, voice layer, UI, eval harness
 docs/use_case.md    business use-case document
 data/restaurants.json
 ```

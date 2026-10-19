@@ -8,6 +8,7 @@ from groq import AuthenticationError
 from streamlit.testing.v1 import AppTest
 
 import goodfoods.agent
+import goodfoods.voice
 from goodfoods.agent.llm import ModelReply, ToolRequest
 
 
@@ -51,3 +52,24 @@ def test_rejected_api_key_shows_a_clear_error(conn, monkeypatch):
     app = AppTest.from_file("../streamlit_app.py", default_timeout=60).run()
     app.chat_input[0].set_value("hi").run()
     assert not app.exception and "rejected the API key" in app.error[0].value
+
+
+class FakeVoice:
+    spoken = 0
+
+    async def speak(self, text, language):
+        FakeVoice.spoken += 1
+        return b"RIFF-wav"
+
+
+def test_reply_is_spoken_only_when_the_guest_asks(conn, monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "test")
+    monkeypatch.setenv("SARVAM_API_KEY", "test")
+    monkeypatch.setattr(goodfoods.agent, "GroqModel", OneLookupModel)
+    monkeypatch.setattr(goodfoods.voice, "Voice", FakeVoice)
+    app = AppTest.from_file("../streamlit_app.py", default_timeout=60).run()
+    app.chat_input[0].set_value("When does R010 close?").run()
+    assert FakeVoice.spoken == 0  # nothing generated or played automatically
+    app.button(key="listen1").click().run()
+    app.button(key="listen1").click().run()
+    assert FakeVoice.spoken == 1  # generated once, then replayed
