@@ -34,10 +34,10 @@ You need a free Groq API key from [console.groq.com](https://console.groq.com/ke
 
 ```bash
 docker build -t goodfoods-agent .
-docker run --rm -p 8501:8501 -e GROQ_API_KEY=your_key -e SARVAM_API_KEY=your_key goodfoods-agent   # Sarvam key optional
+docker run --rm -p 8501:8501 --env-file .env goodfoods-agent
 ```
 
-Open http://localhost:8501. The container seeds the demo database on start.
+Open http://localhost:8501. The container seeds the demo database on start. `.env` is the file from `.env.example`; Docker reads its values literally, so write them without quotes.
 
 **Local (Python 3.10+)**
 
