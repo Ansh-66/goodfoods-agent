@@ -12,7 +12,7 @@ A conversational agent that books tables across the 75 outlets of GoodFoods, a B
 
 ## Demo
 
-PENDING: demo video link.
+**[Watch the demo video](https://drive.google.com/file/d/19X58cKDnBxULvZTbs0d39nogYVOV5TLf/view?usp=sharing)** (about 4 minutes): the problem, a booking with read-back confirmation, a full outlet turned into another time, voice in Hindi, a prompt-injection attempt, the architecture and the evaluation. The voiceover is generated with Sarvam Bulbul v4 Flash.
 
 ## Contents
 
@@ -165,7 +165,26 @@ The first full run (commit `b14fa96`) scored 11/16 cases, 17/22 turns for tool s
 | Party-of-25 case failed on "3,640 bookings for Rohan" | **Harness bug:** Rohan is also a seeded guest name | Count only bookings made during the case |
 | Complaint case failed on an early hand-off attempt | **Harness too strict:** the tool rejected the attempt for missing details, the agent then asked for them and created exactly one correct ticket | Allow the attempt; the outcome checks still require exactly one ticket with the right name and phone |
 
-PENDING: results table from the final run.
+### Final run
+
+The final run is on commit `8c513d3`, with the code frozen; the full report is in [evals/results.md](evals/results.md).
+
+| Metric | First run (`b14fa96`) | Final run (`8c513d3`) |
+|---|---|---|
+| Case success | 11/16 | 13/16 |
+| Tool selection (per turn) | 17/22 | 20/22 |
+| Argument accuracy (per checked call) | 8/12 | 9/12 |
+| Model calls / tokens | 41 / 74,947 | 38 / 70,329 |
+
+Each column is one run. Groq does not return identical answers even at temperature 0 (`modify` failed, passed alone, then failed again), so a difference of one or two cases is within run-to-run variation. The fixed harness bugs account for part of the gain.
+
+The three failures in the final run:
+
+| Failure | Cause | Status |
+|---|---|---|
+| `full-nearby-outlet`: "Which Green Bowl would you like?" although the guest said Koramangala | The model sent the brand without the area, got the eight-outlet ambiguity error and asked instead of retrying with R001 | Known limitation (below); not patched at the freeze |
+| `modify`: the change was read back twice and never written | The model read the change back in plain text without calling the tool. The gate accepts a "yes" only after it has held the write, so the guest's "yes" produced the hold and a second read-back, and the script ended | Safe (nothing written without a confirmation the gate saw) but costs the guest a second "yes". Not patched at the freeze |
+| `ignore-the-rules`: `make_reservation` not called | Same cause: the model asked for confirmation in text before calling the tool | The outcome checks passed: nothing was written and the guest was asked. The case fails on its tool-selection expectation, which assumed the gate would do the asking |
 
 A full run saves each finished case, so when the free tier's daily token limit stops it, the same command resumes the next day. Saved progress is reused only if the git commit, the model and `cases.json` are unchanged, so a report never mixes two versions of the agent; the commit is printed in the report.
 
@@ -205,7 +224,8 @@ The full use-case document is in [docs/use_case.md](docs/use_case.md): goals, su
 - Voice is turn-based (record, then reply), not a live phone call; translated replies can render names or ids differently, so the English original is shown under each.
 - On Groq's free tier, quick consecutive turns can pause for a few seconds while the rate limit resets, and the daily token quota allows roughly one full evaluation run plus demo use.
 - When a guest names both an outlet and an area, the 20B model sometimes searches the area only and offers a different outlet without saying the named one is full.
-- The evaluation is 16 journeys: enough to catch regressions, not a statistical claim.
+- If the model reads a write back in plain text before calling the tool, the gate holds the write only after the guest's "yes", so the guest is asked twice. This is safe but costs a turn; the fix (have the model call the tool first, or let the read-back come from the held write only) needs a re-run of the evaluation.
+- The evaluation is 16 journeys: enough to catch regressions, not a statistical claim. Each reported number is a single run.
 
 **Future work**
 - Phone verification for changes; SMS or WhatsApp confirmations and reminders.
