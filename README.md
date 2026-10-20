@@ -192,7 +192,166 @@ The harness itself is tested (`tests/test_eval.py`): a scripted model shows that
 
 ## Example conversations
 
-PENDING: transcripts from the live app for booking, full outlet, modify or cancel, and hand-off.
+Real conversations from the app (gpt-oss-20b on Groq), recorded on 20 Oct 2026 and copied as they happened, slips included. The tool calls the agent made are shown in grey under each guest message. In conversation 5 the guest's phone number has been replaced with a dummy.
+
+### 1. Booking, with the read-back before anything is written
+
+Shows: recommendations checked free at the requested time; the booking held by the confirmation gate and read back; written only after the guest's yes.
+
+**Guest:** Dinner for 4 this Friday at 8 pm, somewhere Italian near Koramangala
+
+> Tools: `recommend_restaurants(area="Koramangala", cuisine="Italian", date="2026-10-23", time="20:00", party_size=4)` → ok
+
+**Agent:** Here are three good options for Italian dinner near Koramangala on Friday 23 Oct at 8 pm for 4 people:
+
+1. GoodFoods Trattoria, Jayanagar – 3 km away, 4.7 rating, 120 seats, free at 8 pm.
+2. GoodFoods Trattoria, Ulsoor – 5.7 km away, 4.1 rating, 80 seats, free at 8 pm.
+3. GoodFoods Trattoria, Bannerghatta Road – 5.6 km away, 3.9 rating, 40 seats, free at 8 pm.
+
+Which outlet would you like to book?
+
+**Guest:** The first one sounds good. Book it under Ansh, 9876543210
+
+> Tools: `check_availability(restaurant_id="R029", date="2026-10-23", time="20:00", party_size=4)` → ok<br>
+> `make_reservation(restaurant_id="R029", date="2026-10-23", time="20:00", party_size=4, guest_name="Ansh", guest_phone="9876543210")` → **held until the guest confirms**
+
+**Agent:** Your reservation details are:
+
+- Date: Friday 23 Oct
+- Time: 8 pm
+- Outlet: GoodFoods Trattoria, Jayanagar
+- Party size: 4
+- Guest name: Ansh
+- Phone: 9876543210
+
+Do you confirm this booking?
+
+**Guest:** Yes, please confirm
+
+> Tools: `make_reservation(…same arguments…)` → ok
+
+**Agent:** All set! Your table is confirmed for Friday 23 Oct at 8 pm for 4 people at GoodFoods Trattoria, Jayanagar.<br>
+Booking ID: GFGKXDDB.<br>
+Enjoy your dinner!
+
+### 2. A full outlet becomes another time
+
+Shows: the outlet the guest named is full, so the agent offers other times there and the same brand nearby, all from one tool call, then books the guest's choice through the same confirmation gate.
+
+**Guest:** Can I get a table for 2 at Wok Street in Whitefield this Friday at 8 pm?
+
+> Tools: `recommend_restaurants(name="Wok Street", area="Whitefield", date="2026-10-23", time="20:00", party_size=2)` → ok
+
+**Agent:** The GoodFoods Wok Street outlet in Whitefield is fully booked at 8 pm on Friday 23 Oct.<br>
+I can offer you a table at 6:30 pm or 9:30 pm at the same outlet, or a 8 pm slot at the nearby Wok Street in Marathahalli or Sarjapur Road.<br>
+Which option would you like to book?
+
+**Guest:** 9:30 works. Book it under Meera, 9123456780
+
+> Tools: `check_availability(restaurant_id="R004", date="2026-10-23", time="21:30", party_size=2)` → ok<br>
+> `make_reservation(restaurant_id="R004", date="2026-10-23", time="21:30", party_size=2, guest_name="Meera", guest_phone="9123456780")` → **held until the guest confirms**
+
+**Agent:** Your table is set for 9:30 pm on Friday 23 Oct at GoodFoods Wok Street, Whitefield, for 2 people under the name Meera (phone 9123456780).<br>
+Do you confirm this booking?
+
+**Guest:** Yes, confirm
+
+> Tools: `make_reservation(…same arguments…)` → ok
+
+**Agent:** All set! Your booking is confirmed:<br>
+GoodFoods Wok Street, Whitefield<br>
+Date: Friday 23 Oct<br>
+Time: 9:30 pm<br>
+Party: 2<br>
+Guest: Meera (9123456780)<br>
+Booking ID: GF9KUQY4<br>
+Enjoy your meal!
+
+### 3. Change a booking, then cancel it
+
+Shows: changes and cancellations go through the same confirmation gate as new bookings; each is held, read back and written only after the guest replies.
+
+**Guest:** Please change my booking GFGKXDDB to 6 people
+
+> Tools: `modify_reservation(reservation_id="GFGKXDDB", party_size=6)` → **held until the guest confirms**
+
+**Agent:** I've updated the booking to 6 people.<br>
+Is that correct? If so, I'll finalize the change.
+
+**Guest:** Yes, that's right
+
+> Tools: `modify_reservation(…same arguments…)` → ok
+
+**Agent:** Your reservation has been updated to 6 people.<br>
+Booking ID: GFGKXDDB<br>
+GoodFoods Trattoria, Jayanagar – 196, 12th Cross, Jayanagar, Bengaluru<br>
+Date: Friday 23 Oct, Time: 8 pm.<br>
+Enjoy your meal!
+
+**Guest:** Actually, please cancel it
+
+> Tools: `cancel_reservation(reservation_id="GFGKXDDB")` → **held until the guest confirms**
+
+**Agent:** Your booking GFGKXDDB is set to be cancelled.<br>
+Is that correct? If so, I'll proceed with the cancellation.
+
+**Guest:** Yes, cancel it
+
+> Tools: `cancel_reservation(…same arguments…)` → ok
+
+**Agent:** Your reservation has been cancelled.<br>
+If you need anything else, just let me know.
+
+### 4. Hand-off to staff for a large group
+
+Shows: a request outside what the agent may book online (more than 12 guests) goes to staff as a ticket with the guest's details and a summary, instead of a dead end. The two-hour callback promise is the tool's own message, not the model's.
+
+**Guest:** Table for 25 people tomorrow evening in Indiranagar
+
+**Agent:** I'm sorry, but I can't handle a table for 25 people. I'll connect you with a GoodFoods staff member who can arrange that. Could you please share your name and phone number?
+
+**Guest:** Yes please, I'm Rohan, 9812345678
+
+> Tools: `request_human_handoff(reason="large_group", guest_name="Rohan", guest_phone="9812345678", summary="Table for 25 people tomorrow evening in Indiranagar")` → ok
+
+**Agent:** Thank you, Rohan. A GoodFoods team member will call you back within 2 working hours. Have a great day!
+
+### 5. Recommendations with preferences (an imperfect run, kept as it happened)
+
+Shows: the outdoor-seating filter and the date resolved correctly, and outlet details answered from the data. Also shows three real weaknesses: the agent asked for a name before showing the options, referred to outlets by internal id, and did not pass the occasion ("anniversary") to the ranking.
+
+**Guest:** Anniversary dinner for 2 on Saturday at 8 pm, outdoor seating, near Indiranagar
+
+> Tools: `recommend_restaurants(area="Indiranagar", date="2026-10-24", time="20:00", party_size=2, features=["outdoor"])` → ok
+
+**Agent:** Great! Which name would you like on the reservation?
+
+**Guest:** Ansh, 9988776655
+
+**Agent:** Which of the three outlets would you like to book? (R074, R048, or R024)
+
+**Guest:** What time does the first one close, and does it have parking?
+
+> Tools: `get_restaurant_details(restaurant_id="R074")` → ok
+
+**Agent:** GoodFoods Andhra Spice closes at 11 pm and it has parking.<br>
+Would you like to reserve a table for 2 on Saturday 24 Oct at 8 pm?
+
+### 6. Questions the agent should not answer by guessing
+
+Shows: what the data does not cover (a menu) is said plainly with an offer of what is known; a city GoodFoods is not in gets a direct answer; an impossible request (a past date) is declined with a way forward. Before the prompt change described under [Prompt engineering](#prompt-engineering), the first two were refused as off-topic.
+
+**Guest:** What's on the menu at Trattoria Jayanagar?
+
+**Agent:** I'm sorry, but I don't have the menu details for Trattoria Jayanagar. I can share information about the outlet's location, hours, and features if that would help.
+
+**Guest:** Do you have an outlet in Mumbai?
+
+**Agent:** GoodFoods is only in Bengaluru. I can help you find an outlet here.
+
+**Guest:** Book a table for 2 yesterday at 8 pm at Wok Street Whitefield, name Ansh
+
+**Agent:** I'm sorry, but I can't book a table for a past date. If you'd like to reserve for a future time, just let me know the date and time.
 
 ## Business strategy
 
@@ -225,6 +384,8 @@ The full use-case document is in [docs/use_case.md](docs/use_case.md): goals, su
 - On Groq's free tier, quick consecutive turns can pause for a few seconds while the rate limit resets, and the daily token quota allows roughly one full evaluation run plus demo use.
 - When a guest names both an outlet and an area, the 20B model sometimes searches the area only and offers a different outlet without saying the named one is full.
 - If the model reads a write back in plain text before calling the tool, the gate holds the write only after the guest's "yes", so the guest is asked twice. This is safe but costs a turn; the fix (have the model call the tool first, or let the read-back come from the held write only) needs a re-run of the evaluation.
+- The model sometimes words a read-back as if the change were already made ("I've updated the booking…") while it is still held; nothing is written before the guest confirms, but the wording can mislead (conversations 2 and 3).
+- The model sometimes refers to outlets by internal id instead of name, or leaves the occasion out of a search (conversation 5).
 - The evaluation is 16 journeys: enough to catch regressions, not a statistical claim. Each reported number is a single run.
 
 **Future work**
